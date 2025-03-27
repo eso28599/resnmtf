@@ -1,0 +1,25 @@
+add in package names in front of packages - snow?parallel?
+fix indendtation
+
+read me file 
+add tests
+
+
+add errors 
+  -main
+    - k max needs to be less than the rank
+    - data should be positive
+    - check if it works for 
+  -bicl
+  -stability
+  -update_steps
+  -utils
+
+sort line linters
+  -main
+  
+docstrings
+  -main
+  -bicl
+  -stability
+  -utils
