@@ -2,6 +2,32 @@
 # functions to run ResNMTF
 # ---------------------------------
 
+
+#' Calculate error
+calculate_error <- function(data, current_f, current_s, current_g, n_v) {
+  err <- c()
+  for (v in 1:n_v) {
+    x_hat <- current_f[[v]] %*% current_s[[v]] %*% t(current_g[[v]])
+    err <- c(err, sum((data[[v]] - x_hat)**2) / sum((data[[v]])**2))
+  }
+  return(err)
+}
+
+normalisation_check <- function(current_f, current_g, current_s, n_v) {
+  for (v in 1:n_v) {
+    normal_f <- matrix_normalisation(current_f[[v]])
+    current_f[[v]] <- normal_f$normalised_matrix
+    normal_g <- matrix_normalisation(current_g[[v]])
+    current_g[[v]] <- normal_g$normalised_matrix
+    current_s[[v]] <- (normal_f$normaliser) %*%
+      current_s[[v]] %*% normal_g$normaliser
+  }
+  return(list(
+    "current_f" = current_f, "current_g" = current_g,
+    "current_s" = current_s
+  ))
+}
+
 # Application of ResNMTF to data!
 #' @title Apply ResNMTF
 #' @description Apply ResNMTF to data, without stability analysis and
@@ -51,8 +77,6 @@ res_nmtf_inner <- function(
     current_lam <- lapply(current_f, colSums)
     current_mu <- lapply(current_g, colSums)
   }
-  # Initialising additional parameters
-  x_hat <- vector("list", length = n_v)
   # Update until convergence, or for n_iters times
   if (is.null(n_iters)) {
     total_err <- c()
@@ -60,7 +84,6 @@ res_nmtf_inner <- function(
     err_diff <- 1
     err_temp <- 0
     while ((err_diff > 1.0e-6)) {
-      err <- numeric(length = n_v)
       new_parameters <- update_matrices(
         x = data,
         input_f = current_f,
@@ -77,10 +100,7 @@ res_nmtf_inner <- function(
       current_g <- new_parameters$output_g
       current_lam <- new_parameters$output_lam
       current_mu <- new_parameters$output_mu
-      for (v in 1:n_v) {
-        x_hat[[v]] <- current_f[[v]] %*% current_s[[v]] %*% t(current_g[[v]])
-        err[v] <- sum((data[[v]] - x_hat[[v]])**2) / sum((data[[v]])**2)
-      }
+      err <- calculate_error(data, current_f, current_s, current_g, n_v)
       mean_err <- mean(err)
       total_err <- c(total_err, mean_err)
       err_diff <- abs(mean_err - err_temp)
@@ -106,21 +126,16 @@ res_nmtf_inner <- function(
       current_g <- new_parameters$output_g
       current_lam <- new_parameters$output_lam
       current_mu <- new_parameters$output_mu
-      for (v in 1:n_v) {
-        x_hat[[v]] <- current_f[[v]] %*% current_s[[v]] %*% t(current_g[[v]])
-        err[v] <- sum((data[[v]] - x_hat[[v]])**2) / sum((data[[v]])**2)
-      }
-      total_err[t] <- mean(err)
+      total_err[t] <- mean(calculate_error(
+        data, current_f,
+        current_s, current_g, n_v
+      ))
     }
   }
-  for (v in 1:n_v) {
-    normal_f <- matrix_normalisation(current_f[[v]])
-    current_f[[v]] <- normal_f$normalised_matrix
-    normal_g <- matrix_normalisation(current_g[[v]])
-    current_g[[v]] <- normal_g$normalised_matrix
-    current_s[[v]] <- (normal_f$normaliser) %*%
-      current_s[[v]] %*% normal_g$normaliser
-  }
+  normalised <- normalisation_check(current_f, current_g, current_s, n_v)
+  current_f <- normalised[["current_f"]]
+  current_g <- normalised[["current_g"]]
+  current_s <- normalised[["current_s"]]
   # if only need to obtain factorisation, return values now
   if (no_clusts) {
     return(list(
@@ -141,12 +156,21 @@ res_nmtf_inner <- function(
   return(list(
     "output_f" = current_f, "output_s" = current_s,
     "output_g" = current_g, "Error" = error,
-    "All_Error" = total_err, "Sil_score" = clusters$bisil,
+    "All_Error" = total_err, "bisil" = clusters$bisil,
     "row_clusters" = clusters$row_clustering,
     "col_clusters" = clusters$col_clustering,
     "lambda" = current_lam,
     "mu" = current_mu
   ))
+}
+
+extract_bisils <- function(res_list, k_vec) {
+  # extract scores
+  err_list <- c()
+  for (i in seq_along(k_vec)) {
+    err_list <- c(err_list, res_list[[i]][["bisil"]])
+  }
+  return(err_list)
 }
 
 #' @param k_max integer, default is 6, must be greater than 2,
@@ -157,12 +181,15 @@ res_nmtf_inner <- function(
 #'                 distance metric to use within the bisilhouette score
 #' @param repeats integer, default is 5, minimum value of 2,
 #'                number of repeats to use for ??
-#' @param no_clusts boolean, default is FALSE, whether to return only the factorisation or not,
-#' @param sample_rate numeric, default is 0.9, proportion of data to sample for stability analysis,
-#' @param n_stability integer, default is 5, number of times to repeat stability analysis,
-#' @param stability boolean, default is TRUE, whether to perform stability analysis or not,
+#' @param no_clusts boolean, default is FALSE, whether to return
+#'                  only the factorisation or not,
+#' @param sample_rate numeric, default is 0.9,
+#'                    proportion of data to sample for stability analysis,
+#' @param n_stability integer, default is 5,
+#'                    number of times to repeat stability analysis,
+#' @param stability boolean, default is TRUE,
+#'                  whether to perform stability analysis or not,
 #' @param stab_thres numeric, default is 0.4, threshold for stability analysis,
-#' @param stab_test boolean, default is FALSE, whether to perform stability test or not,
 #' @param data list of matrices, data to be factorised,
 #' @param init_f list of matrices, initialisation for F matrices,
 #' @param init_s list of matrices, initialisation for S matrices,
@@ -182,10 +209,24 @@ res_nmtf_inner <- function(
 #'   stability = FALSE
 #' )
 #' apply_resnmtf(data = data, k_vec = c(3, 3), n_iters = 100, no_clusts = TRUE)
-#' apply_resnmtf(data = data, k_vec = c(3, 3), n_iters = 100, k_min = 3, k_max = 8)
-#' apply_resnmtf(data = data, k_vec = c(3, 3), n_iters = 100, k_min = 3, k_max = 8, distance = "euclidean")
-#' apply_resnmtf(data = data, k_vec = c(3, 3), n_iters = 100, k_min = 3, k_max = 8, distance = "euclidean", repeats = 5)
-#' apply_resnmtf(data = data, k_vec = c(3, 3), n_iters = 100, k_min = 3, k_max = 8, distance = "euclidean", repeats = 5, no_clusts = FALSE)
+#' apply_resnmtf(
+#'   data = data, k_vec = c(3, 3),
+#'   n_iters = 100, k_min = 3, k_max = 8
+#' )
+#' apply_resnmtf(
+#'   data = data, k_vec = c(3, 3),
+#'   n_iters = 100, k_min = 3, k_max = 8, distance = "euclidean"
+#' )
+#' apply_resnmtf(
+#'   data = data, k_vec = c(3, 3),
+#'   n_iters = 100, k_min = 3, k_max = 8,
+#'   distance = "euclidean", repeats = 5
+#' )
+#' apply_resnmtf(
+#'   data = data, k_vec = c(3, 3),
+#'   n_iters = 100, k_min = 3, k_max = 8,
+#'   distance = "euclidean", repeats = 5, no_clusts = FALSE
+#' )
 apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
                           init_g = NULL, k_vec = NULL,
                           phi = NULL, xi = NULL, psi = NULL,
@@ -233,10 +274,8 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
   k_vec <- k_min:k_max
   n_k <- length(k_vec)
   ones_vec <- rep(1, n_v)
-  # initialise storage of results
   # apply method for each k to be considered
-  # how many jobs you want the computer to run at the same time
-  # if on windows operating system - do normal for loop
+  # if on windows or linux operating system - do normal for loop
   if ((.Platform$OS.type == "windows") || (.Platform$OS.type == "unix")) {
     res_list <- vector("list", length = n_k)
     for (i in 1:n_k) {
@@ -258,27 +297,23 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
     }
   }
   # extract scores
-  err_list <- rep(0, length(k_vec))
-  for (i in seq_along(k_vec)) {
-    err_list[i] <- res_list[[i]][["Sil_score"]][1]
-  }
-  # find value of k of lowest error
+  err_list <- extract_bisils(res_list, k_vec)
   test <- k_vec[which.max(err_list)]
-  max_i <- k_max
+  max_k <- k_max
   # if best performing k is the largest k considered
   # apply method to k + 1 until this is no longer the case
   if (k_min != k_max) {
-    while (test == max_i) {
-      max_i <- max_i + 1
-      k_vec <- c(k_vec, max_i)
-      k <- max_i * k_vec
+    while (test == max_k) {
+      max_k <- max_k + 1
+      k_vec <- c(k_vec, max_k)
+      k <- max_k * rep(1, n_v)
       new_l <- length(k_vec)
       res_list[[new_l]] <- res_nmtf_inner(
         data, init_f, init_s, init_g,
         k, phi, xi, psi, n_iters,
         repeats, distance, no_clusts
       )
-      err_list <- c(err_list, res_list[[new_l]][["Sil_score"]][1])
+      err_list <- c(err_list, res_list[[new_l]][["bisil"]][1])
       test <- k_vec[which.max(err_list)]
     }
   }

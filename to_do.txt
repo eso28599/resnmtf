@@ -1,6 +1,7 @@
-add in package names in front of packages - snow?parallel?
-fix indendtation
-
+add in package names in front of packages 
+  - dopar?
+change so you can specify whether to use paraller or not
+add so that you 
 read me file 
 add tests
 
@@ -23,3 +24,5 @@ docstrings
   -bicl
   -stability
   -utils
+
+change Sil_score to bisil in script files etc.

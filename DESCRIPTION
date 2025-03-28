@@ -3,7 +3,7 @@ Title: Determines a multi-view biclustering via ResNMTF
 Version: 0.0.0.9000
 Authors@R: 
     person("Ella", "Orme", , "eso18@ic.ac.uk", role = c("aut", "cre"))
-Description: What the package does (one paragraph). Make sure can install bisilhouette from the link. Go through functions and add packages.
+Description: What the package does (one paragraph). Make sure can install bisilhouette from the link. Go through functions and add packages. Add versions here. 
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
