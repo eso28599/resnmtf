@@ -18,6 +18,12 @@ shuffle_view <- function(x_i) {
   return(x_messed)
 }
 
+#' @description obtains F matrices from shuffled data
+#' @param data list of data matrices
+#' @param n_views number of views
+#' @param repeats number of repeats
+#' @param n_clusts number of biclusters
+#' @return list of shuffled F matrices
 obtain_shuffled_f <- function(data, n_views, repeats, n_clusts) {
   f_mess <- vector(mode = "list", length = repeats)
   for (n in 1:repeats) {
@@ -31,8 +37,17 @@ obtain_shuffled_f <- function(data, n_views, repeats, n_clusts) {
   return(f_mess)
 }
 
+#' @description calculate JSD between the columns of two F matrices
+#' @param f_mess list of lists of F matrices
+#' @param i index of the view
+#' @param j index of the repeat
+#' @param repeats number of repeats
+#' @param n_clusts number of biclusters
+#' @return vector of JSD scores
+#' @details Calculate the JSD scores between the columns of the F matrix
+#'          of the ith view from the jth repeat,
+#'          for all columns from additional repeats
 calculate_f_shuffle_jsd <- function(f_mess, i, j, repeats, n_clusts) {
-  # calculate jsd between shuffled F matrices
   scores <- c()
   for (k in 1:n_clusts) {
     # jth repeat, ith view, kth cluster
@@ -80,10 +95,17 @@ get_thresholds <- function(x, output_f, repeats, n_views, n_clusts) {
   ))
 }
 
+#' @title Check biclusters
+#' @description Determine scores and thresholds of the factorisation
+#'              to be used to remove biclusters
+#' @param data list of data matrices
+#' @param output_f list of F matrices
+#' @param repeats number of repeats
+#' @return list containing the JSD scores,
+#'             average and max thresholds
 check_biclusters <- function(data, output_f, repeats) {
   n_views <- length(data)
   n_clusts <- dim(output_f[[1]])[2]
-  # updated results
   scores <- matrix(0, nrow = n_views, ncol = n_clusts)
   thresholds <- get_thresholds(data, output_f, repeats, n_views, n_clusts)
   for (i in 1:n_views) {
@@ -103,20 +125,21 @@ check_biclusters <- function(data, output_f, repeats) {
   ))
 }
 
-# Obtains biclustering from ResNMTF factorisation
-# Args:
-#  data: list of data matrices
-#  output_f: list of F matrices
-#  output_g: list of G matrices
-#  output_s: list of S matrices
-#  repeats: minimum value of 2
-#  distance: distance metric to use, can be . Default is euclidean.
-# Returns:
-#  list containing row and column clusterings,
-# and the bisilhouette score of the biclustering
-
+#' @title Obtain biclusters
+#' @description obtain biclusters from ResNMTF factorisation,
+#'              removing those deemed to be spurious
+#' @param data list of data matrices
+#' @param output_f list of F matrices
+#' @param output_g list of G matrices
+#' @param output_s list of S matrices
+#' @param repeats number of repeats
+#' @param distance distance metric to use, default is "euclidean".
+#'                 Can be "manhattan", "maximum", "canberra", "binary",
+#'                 "minkowski" or "pearson"
+#' @return list containing row and column clusterings,
 obtain_biclusters <- function(data, output_f,
-                              output_g, output_s, repeats, distance) {
+                              output_g, output_s, repeats,
+                              distance = "euclidean") {
   n_views <- length(output_f)
   row_clustering <- vector("list", length = n_views)
   col_clustering <- vector("list", length = n_views)

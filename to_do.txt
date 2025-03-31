@@ -3,18 +3,18 @@ add in package names in front of packages
 change so you can specify whether to use parallel or not
 read me file 
 
-
 add tests
+- multi view
+- restriction
 
 add errors 
   -main
     - k max needs to be less than the rank
     - data should be positive
-    - check if it works for 
+    - convert one view to list
 
 docstrings
   -main
-  -bicl
   -stability
 
 change Sil_score to bisil in script files etc.
