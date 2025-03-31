@@ -1,28 +1,20 @@
 add in package names in front of packages 
   - dopar?
-change so you can specify whether to use paraller or not
-add so that you 
+change so you can specify whether to use parallel or not
 read me file 
-add tests
 
+
+add tests
 
 add errors 
   -main
     - k max needs to be less than the rank
     - data should be positive
     - check if it works for 
-  -bicl
-  -stability
-  -update_steps
-  -utils
 
-sort line linters
-  -main
-  
 docstrings
   -main
   -bicl
   -stability
-  -utils
 
 change Sil_score to bisil in script files etc.

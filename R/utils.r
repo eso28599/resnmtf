@@ -1,20 +1,34 @@
-## General manipulation functions
+# ---------------------------------
+# utility functions
+# ---------------------------------
+
+#' @description makes a list of matrices non-negative
+#' @param x list of matrices
+#' @return list of non-negative matrices
 make_non_neg <- function(x) {
-  # makes a list of matrices non-negative
-  #' x: list of matrices
   return(lapply(x, make_non_neg_inner))
 }
 
+#' @description makes a matrix non-negative
+#' @param matrix matrix to be made non-negative
+#' @return non-negative matrix
+#' @details This function adds the absolute value of the minimum element
+#'   of the matrix to each element of the matrix. This ensures that all
+#'   elements of the matrix are non-negative.
 make_non_neg_inner <- function(matrix) {
   # makes a matrix non-negative
   return(apply(matrix, 2, function(x) x + abs(min(0, min(x)))))
 }
 
-# function which takes a list L and vector v as input
-# returns sum(v_i*L[[i]])
-#' mat_list: list of k matrices
-#' vec: a vector of length k
-#' Output: a matrix of same dimensions as the entries in mat_list
+#' @description Computes the product of a vector and a list of matrices
+#' @param vec vector
+#' @param mat_list list of matrices
+#' @return matrix
+#' @details This function computes the product of a vector and a
+#'          list of matrices where the product is defined as the sum
+#'          of the product of each element of the vector
+#'          with the corresponding matrix in the list. The function
+#'          returns a matrix of the same dimensions as the entries in the list.
 star_prod <- function(vec, mat_list) {
   vec_mat <- 0
   for (i in seq_len(length(vec))) {
@@ -25,10 +39,13 @@ star_prod <- function(vec, mat_list) {
   return(vec_mat)
 }
 
+#' @description normalises a matrix
+#' @param matrix matrix to be normalised
+#' @return list with two elements: normaliser and normalised_matrix
+#' @details This function normalises a matrix so that the l1 norm
+#'          of each column is 1.
 matrix_normalisation <- function(matrix) {
-  # normalises a matrix so that the l1 norm of each column is 1
   normaliser <- diag(colSums(matrix))
-  # solve Q
   normalised_matrix <- matrix %*% solve(normaliser)
   return(list(
     "normaliser" = normaliser,
@@ -36,10 +53,11 @@ matrix_normalisation <- function(matrix) {
   ))
 }
 
-### functions for calculating JSD
+#' @description Computes the Jensen-Shannon divergence between two vectors
+#' @param x1 first vector
+#' @param x2 second vector
+#' @return Jensen-Shannon divergence
 jsd_calc <- function(x1, x2) {
-  # calculate the Jensen Shannon divergence between
-  # vectors x1 and x2
   max_val <- max(x1, x2)
   d1 <- stats::density(x1, from = 0, to = max_val)
   d2 <- stats::density(x2, from = 0, to = max_val)
@@ -52,6 +70,14 @@ jsd_calc <- function(x1, x2) {
   )
 }
 
+#' @description Computes the Jaccard similarity between two sets
+#' @param a first set
+#' @param b second set
+#' @return Jaccard similarity
+#' @details This function computes the Jaccard similarity between
+#'          two sets calculated as intersect(a,  b) / union(a, b).
+#'          The function returns 0 if the union of the two sets is empty.
+#'          The function returns 1 if the two sets are equal.
 jaccard_func <- function(a, b) {
   # calculate jaccard between two vectors
   intersection <- length(intersect(a, b))
@@ -63,6 +89,10 @@ jaccard_func <- function(a, b) {
   }
 }
 
+#' @description Computes the cartesian product of two sets
+#' @param a first set
+#' @param b second set
+#' @return a x b
 cart_prod <- function(a, b) {
   # returns cartesian product of two sets
   prod <- c()
