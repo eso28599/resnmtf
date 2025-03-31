@@ -3,10 +3,8 @@
 # ---------------------------------
 
 
-#' @title calculate Jaccard index between two sets
-#' @description calculate Jaccard index between two sets
-#' @param samps set of samples
-#' @param feats set of features
+#' @title calculate Jaccard index between two biclusterings
+#' @description calculate Jaccard index between two biclusterins
 #' @param row_c row clusters
 #' @param col_c column clusters
 #' @param true_r true row clusters
@@ -14,8 +12,10 @@
 #' @param m number of row clusters
 #' @param n number of column clusters
 #' @return matrix of Jaccard indices
-jaccard_main <- function(samps, feats, row_c, col_c, true_r, true_c, m, n) {
+jaccard_main <- function(row_c, col_c, true_r, true_c, m, n) {
   # initialise storage of jaccard index between pairs
+  samps <- seq_along(row_c[, 1])
+  feats <- seq_along(col_c[, 1])
   jac_mat <- matrix(0, nrow = m, ncol = n)
   for (i in 1:m) {
     r_i <- samps[row_c[, i] == 1]
@@ -31,6 +31,15 @@ jaccard_main <- function(samps, feats, row_c, col_c, true_r, true_c, m, n) {
   return(jac_mat)
 }
 
+#' @title calculate the relevance of biclusters
+#' @description calculate the relevannce of biclusters obtained from
+#'              sub-sampled data, using the initial biclustering
+#'              as the ground truth
+#' @param row_c row clusters
+#' @param col_c column clusters
+#' @param true_r true row clusters
+#' @param true_c true column clusters
+#' @return vector of relevance values for each bicluster
 relevance_results <- function(row_c, col_c, true_r, true_c) {
   m <- ncol(row_c)
   n <- ncol(true_r)
@@ -50,14 +59,16 @@ relevance_results <- function(row_c, col_c, true_r, true_c) {
   if (m_0 == 0 && n_0 == 0) {
     return(1)
   }
-  samps <- seq_along(row_c[, 1])
-  feats <- seq_along(col_c[, 1])
   # initialise storage of jaccard index between pairs
-  jac_mat <- jaccard_main(samps, feats, row_c, col_c, true_r, true_c, m, n)
+  jac_mat <- jaccard_main(row_c, col_c, true_r, true_c, m, n)
   return(apply(jac_mat, 2, max))
 }
 
 #' Test whether there are any columns/rows with only zeros
+#' @description Test whether there are any columns/rows with only zeros
+#' @param data list of matrices to be tested
+#' @param attempt number of attempts made to sample data
+#' @return TRUE if any columns/rows with only zeros, FALSE otherwise
 test_cond <- function(data, attempt) {
   if (attempt == 1) {
     return(TRUE)
@@ -70,6 +81,10 @@ test_cond <- function(data, attempt) {
   ))))
 }
 
+#' @title number of biclusters
+#' @description determine number of biclusters
+#' @param results results of apply_resnmtf/res_nmtf_inner
+#' @return number of biclusters
 number_biclusters <- function(results) {
   return(sum(as.numeric(lapply(
     results$row_clusters,
@@ -77,6 +92,17 @@ number_biclusters <- function(results) {
   ))))
 }
 
+#' @title shuffle view
+#' @description shuffle view
+#' @param data list of matrices to be shuffled
+#' @param new_data list of shuffled matrices
+#' @param dims dimensions of the view to be shuffled
+#' @param dim dimensions of the first view
+#' @param dim_1 dimensions of the first view
+#' @param i index of the view to be shuffled
+#' @param sample_rate rate at which to sample
+#' @param row_samples list of rows to sample
+#' @param col_samples list of cols to sample
 initial_shuffle <- function(
     data, new_data, dims, dim, i,
     sample_rate, row_samples, col_samples) {
@@ -98,10 +124,27 @@ initial_shuffle <- function(
   ))
 }
 
+#' @title check for empty matrix
+#' @description check if matrix has any rows/columns with only zeros
+#' @param data list of matrices to be checked
+#' @param i index of the view to be checked
+#' @return TRUE if any rows/columns with only zeros, FALSE otherwise
 check_empty <- function(data, i) {
   return(any(colSums(data[[i]]) == 0) || any(rowSums(data[[i]]) == 0))
 }
 
+#' @title sample view
+#' @description sample view
+#' @param data list of matrices to be shuffled
+#' @param new_data list of shuffled matrices
+#' @param dims dimensions of the view to be shuffled
+#' @param dim_1 dimensions of the first view
+#' @param i index of the view to be shuffled
+#' @param row_samples list of rows to sample
+#' @param col_samples list of cols to sample
+#' @param sample_rate rate at which to sample
+#' @return list of shuffled matrices (new_data),
+#'         rows (row_samples) and columns (col_samples)
 sample_view <- function(data, i, new_data, dim_1,
                         row_samples, col_samples, sample_rate) {
   dims <- dim(data[[i]])
@@ -139,7 +182,24 @@ sample_view <- function(data, i, new_data, dim_1,
   ))
 }
 
-
+#' @title stability repeat
+#' @description perform stability analysis on the results
+#' @param results results of apply_resnmtf/res_nmtf_inner
+#' @param data list of matrices to be shuffled
+#' @param dim_1 dimensions of the first view
+#' @param k number of biclusters
+#' @param phi phi restriction parameter
+#' @param xi xi restriction parameter
+#' @param psi psi restriction parameter
+#' @param n_iters number of iterations
+#' @param repeats number of repeats
+#' @param distance distance metric to be used within res_nmtf_inner
+#' @param n_views number of views
+#' @param sample_rate rate at which to sample
+#' @return matrix (i, j) of relevance values
+#'         for each bicluster (j) in each view (i)
+#'         and whether stability analysis was performed
+#'         (stability_performed)
 stability_repeat <- function(results, data, dim_1, k, phi, xi, psi, n_iters,
                              repeats, distance, n_views, sample_rate) {
   new_data <- vector(mode = "list", length = n_views)
@@ -195,7 +255,26 @@ stability_repeat <- function(results, data, dim_1, k, phi, xi, psi, n_iters,
   return(list("relevance" = relevance, "stability_performed" = TRUE))
 }
 
-stability_check <- function(data, init_s, results,
+#' @title stability check
+#' @description perform stability analysis on the biclustering results
+#' @param data list of input matrices
+#' @param results results of apply_resnmtf/res_nmtf_inner
+#' @param k number of biclusters found
+#' @param phi phi restriction parameter
+#' @param xi xi restriction parameter
+#' @param psi psi restriction parameter
+#' @param n_iters number of iterations
+#' @param repeats number of repeats
+#' @param no_clusts number of clusters
+#' @param distance distance metric to be used within res_nmtf_inner
+#' @param sample_rate rate at which to sample
+#' @param n_stability number of stability checks to perform
+#' @param stab_thres threshold for stability
+#' @param remove_unstable whether to remove unstable biclusters
+#' @return results of biclustering with unstable biclusters removed
+#'         (if applicable) or a list containing the initial results and
+#'         relevance values for each bicluster
+stability_check <- function(data, results,
                             k, phi, xi, psi, n_iters,
                             repeats, no_clusts, distance, sample_rate = 0.9,
                             n_stability = 5, stab_thres = 0.6,

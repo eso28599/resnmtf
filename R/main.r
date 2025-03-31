@@ -3,7 +3,14 @@
 # ---------------------------------
 
 
-#' Calculate error
+#' @title Calculate error
+#' @description Calculate error for ResNMTF
+#' @param data list of matrices, data to be factorised,
+#' @param current_f list of matrices, current F matrices
+#' @param current_s list of matrices, current S matrices
+#' @param current_g list of matrices, current G matrices
+#' @param n_v integer, number of views
+#' @return numeric vector, error for each view
 calculate_error <- function(data, current_f, current_s, current_g, n_v) {
   err <- c()
   for (v in 1:n_v) {
@@ -13,6 +20,13 @@ calculate_error <- function(data, current_f, current_s, current_g, n_v) {
   return(err)
 }
 
+#' @title Normalise matrix
+#' @description Normalises matrix factors
+#' @param current_f list of matrices, current F matrices
+#' @param current_g list of matrices, current G matrices
+#' @param current_s list of matrices, current S matrices
+#' @param n_v integer, number of views
+#' @return list of matrices, normalised F, G and S matrices
 normalisation_check <- function(current_f, current_g, current_s, n_v) {
   for (v in 1:n_v) {
     normal_f <- matrix_normalisation(current_f[[v]])
@@ -28,20 +42,19 @@ normalisation_check <- function(current_f, current_g, current_s, n_v) {
   ))
 }
 
-# Application of ResNMTF to data!
-#' @title Apply ResNMTF
+#' @title ResNMTF inner functiion
 #' @description Apply ResNMTF to data, without stability analysis and
 #'              for a specific number of biclusters
-#' @param data list of matrices, data to be factorised,
-#' @param init_f list of matrices, initialisation for F matrices,
-#' @param init_s list of matrices, initialisation for S matrices,
-#' @param init_g list of matrices, initialisation for G matrices,
-#' @param k_vec integer, vector of integers, number of clusters to consider,
-#' @param phi list of matrices, default is NULL, restriction matrices for F,
-#' @param xi list of matrices, default is NULL, restriction matrices for S,
-#' @param psi list of matrices, default is NULL, restriction matrices for G,
-#' @param n_iters integer, default is NULL, number of iterations to run for,
-#' @param repeats integer, default is 5, minimum value of 2,
+#' @param data list of matrices, data to be factorised
+#' @param init_f list of matrices, initialisation for F matrices
+#' @param init_s list of matrices, initialisation for S matrices
+#' @param init_g list of matrices, initialisation for G matrices
+#' @param k_vec integer, vector of integers, number of clusters to consider
+#' @param phi list of matrices, default is NULL, restriction matrices for F
+#' @param xi list of matrices, default is NULL, restriction matrices for S
+#' @param psi list of matrices, default is NULL, restriction matrices for G
+#' @param n_iters integer, default is NULL, number of iterations to run for
+#' @param repeats integer, default is 5, minimum value of 2
 #'                number of repeats to use for ??
 #' @param distance string, default is "euclidean",
 #'                 distance metric to use within the bisilhouette score
@@ -51,15 +64,9 @@ normalisation_check <- function(current_f, current_g, current_s, n_v) {
 #' @return list of results from ResNMTF
 #' @export
 res_nmtf_inner <- function(
-    data,
-    init_f = NULL,
-    init_s = NULL,
-    init_g = NULL, k_vec = NULL,
-    phi = NULL, xi = NULL, psi = NULL,
-    n_iters = NULL,
-    repeats = 5,
-    distance = "euclidean",
-    no_clusts = FALSE) {
+    data, init_f = NULL, init_s = NULL, init_g = NULL,
+    k_vec = NULL, phi = NULL, xi = NULL, psi = NULL,
+    n_iters = NULL, repeats = 5, distance = "euclidean", no_clusts = FALSE) {
   n_v <- length(data)
   # initialise F, S and G based on svd decomposition if not given
   if (is.null(init_f) || is.null(init_g) || is.null(init_s)) {
@@ -203,30 +210,16 @@ extract_bisils <- function(res_list, k_vec) {
 #' @export
 #' @examples
 #' data <- list(matrix(rnorm(100), nrow = 10), matrix(rnorm(100), nrow = 10))
+#' # if it is known there are 3 clusters in each view
 #' apply_resnmtf(data = data, k_vec = c(3, 3), n_iters = 100)
-#' apply_resnmtf(
-#'   data = data, k_vec = c(3, 3), n_iters = 100,
-#'   stability = FALSE
-#' )
-#' apply_resnmtf(data = data, k_vec = c(3, 3), n_iters = 100, no_clusts = TRUE)
-#' apply_resnmtf(
-#'   data = data, k_vec = c(3, 3),
-#'   n_iters = 100, k_min = 3, k_max = 8
-#' )
-#' apply_resnmtf(
-#'   data = data, k_vec = c(3, 3),
-#'   n_iters = 100, k_min = 3, k_max = 8, distance = "euclidean"
-#' )
-#' apply_resnmtf(
-#'   data = data, k_vec = c(3, 3),
-#'   n_iters = 100, k_min = 3, k_max = 8,
-#'   distance = "euclidean", repeats = 5
-#' )
-#' apply_resnmtf(
-#'   data = data, k_vec = c(3, 3),
-#'   n_iters = 100, k_min = 3, k_max = 8,
-#'   distance = "euclidean", repeats = 5, no_clusts = FALSE
-#' )
+#' # not performing stability analysis
+#' apply_resnmtf(data = data, stability = FALSE)
+#' # returning only the factorisation
+#' apply_resnmtf(data = data, no_clusts = TRUE)
+#' # changing the default range of k searched
+#' apply_resnmtf(data = data, k_min = 5, k_max = 10)
+#' # changing the distance metric
+#' apply_resnmtf(data = data, distance = "euclidean")
 apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
                           init_g = NULL, k_vec = NULL,
                           phi = NULL, xi = NULL, psi = NULL,
@@ -261,7 +254,7 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
     # otherwise we want the results
     if (stability) {
       return(stability_check(
-        data, init_s, results,
+        data, results,
         k_vec, phi, xi, psi, n_iters,
         repeats, no_clusts, distance, sample_rate,
         n_stability, stab_thres
@@ -321,7 +314,7 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
   results <- res_list[[k]]
   if (stability) {
     return(stability_check(
-      data, init_s, results,
+      data, results,
       k_vec[k], phi, xi, psi, n_iters,
       repeats, no_clusts, distance,
       sample_rate, n_stability,

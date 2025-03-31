@@ -2,6 +2,7 @@ add in package names in front of packages
   - dopar?
 change so you can specify whether to use parallel or not
 read me file 
+change stability so only use phi/xi to shuffle the same
 
 add tests
 - multi view
@@ -13,8 +14,5 @@ add errors
     - data should be positive
     - convert one view to list
 
-docstrings
-  -main
-  -stability
-
 change Sil_score to bisil in script files etc.
+- use cases changing number of biclusters
