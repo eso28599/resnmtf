@@ -1,12 +1,33 @@
+test_that("test_cond identifies rows/columns with only zeros", {
+  # Case 1: Matrix with no zeros
+  data <- list(matrix(1:9, 3, 3))
+  expect_false(test_cond(data, attempt = 2))
+
+  # Case 2: Matrix with a row of zeros
+  data <- list(matrix(c(1, 2, 3, 0, 0, 0, 7, 8, 9), 3, 3, byrow = TRUE))
+  expect_true(test_cond(data, attempt = 2))
+
+  # Case 3: Matrix with a column of zeros
+  data <- list(matrix(c(1, 0, 3, 4, 0, 6, 7, 0, 9), 3, 3, byrow = TRUE))
+  expect_true(test_cond(data, attempt = 2))
+
+  # Case 4: Matrix with all zeros
+  data <- list(matrix(0, 3, 3))
+  expect_true(test_cond(data, attempt = 2))
+
+  # Case 5: Large matrix with no zeros
+  data <- list(matrix(runif(100, 1, 10), 10, 10))
+  expect_false(test_cond(data, attempt = 2))
+
+  # Case 5: Large matrix with no zeros, but first attempt
+  data <- list(matrix(runif(100, 1, 10), 10, 10))
+  expect_true(test_cond(data, attempt = 1))
+})
+
 data <- list(
   matrix(rnorm(100), 10, 10),
   matrix(rnorm(100), 10, 10)
 )
-
-test_that("multiplication works", {
-  expect_equal(2 * 2, 4)
-})
-
 
 test_that("view shuffling works", {
   expect_equal(length(lapply(data, shuffle_view)), 2)
@@ -35,6 +56,12 @@ data <- list(
   row_clusters %*% diag(c(5, 5, 5)) %*% t(col_clusters) +
     abs(0.01 * matrix(rnorm(100 * n_col), 100, n_col))
 )
+test_that("get warning for negative matrix", {
+  expect_warning(
+    apply_resnmtf(-data[[1]], k_max = 4),
+    "Matrix is not non-negative. Has been made non-negative."
+  )
+})
 
 test_that("resnmtf runs", {
   results <- apply_resnmtf(data, k_max = 4)

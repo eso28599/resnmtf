@@ -6,6 +6,14 @@
 \usage{
 test_cond(data, attempt)
 }
+\arguments{
+\item{data}{list of matrices to be tested}
+
+\item{attempt}{number of attempts made to sample data}
+}
+\value{
+TRUE if any columns/rows with only zeros, FALSE otherwise
+}
 \description{
 Test whether there are any columns/rows with only zeros
 }

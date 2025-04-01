@@ -2,15 +2,11 @@
 % Please edit documentation in R/stability_analysis.r
 \name{jaccard_main}
 \alias{jaccard_main}
-\title{calculate Jaccard index between two sets}
+\title{calculate Jaccard index between two biclusterings}
 \usage{
-jaccard_main(samps, feats, row_c, col_c, true_r, true_c, m, n)
+jaccard_main(row_c, col_c, true_r, true_c, m, n)
 }
 \arguments{
-\item{samps}{set of samples}
-
-\item{feats}{set of features}
-
 \item{row_c}{row clusters}
 
 \item{col_c}{column clusters}
@@ -27,5 +23,5 @@ jaccard_main(samps, feats, row_c, col_c, true_r, true_c, m, n)
 matrix of Jaccard indices
 }
 \description{
-calculate Jaccard index between two sets
+calculate Jaccard index between two biclusterins
 }

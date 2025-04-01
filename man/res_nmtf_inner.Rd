@@ -2,7 +2,7 @@
 % Please edit documentation in R/main.r
 \name{res_nmtf_inner}
 \alias{res_nmtf_inner}
-\title{Apply ResNMTF}
+\title{ResNMTF inner functiion}
 \usage{
 res_nmtf_inner(
   data,
@@ -20,25 +20,25 @@ res_nmtf_inner(
 )
 }
 \arguments{
-\item{data}{list of matrices, data to be factorised,}
+\item{data}{list of matrices, data to be factorised}
 
-\item{init_f}{list of matrices, initialisation for F matrices,}
+\item{init_f}{list of matrices, initialisation for F matrices}
 
-\item{init_s}{list of matrices, initialisation for S matrices,}
+\item{init_s}{list of matrices, initialisation for S matrices}
 
-\item{init_g}{list of matrices, initialisation for G matrices,}
+\item{init_g}{list of matrices, initialisation for G matrices}
 
-\item{k_vec}{integer, vector of integers, number of clusters to consider,}
+\item{k_vec}{integer, vector of integers, number of clusters to consider}
 
-\item{phi}{list of matrices, default is NULL, restriction matrices for F,}
+\item{phi}{list of matrices, default is NULL, restriction matrices for F}
 
-\item{xi}{list of matrices, default is NULL, restriction matrices for S,}
+\item{xi}{list of matrices, default is NULL, restriction matrices for S}
 
-\item{psi}{list of matrices, default is NULL, restriction matrices for G,}
+\item{psi}{list of matrices, default is NULL, restriction matrices for G}
 
-\item{n_iters}{integer, default is NULL, number of iterations to run for,}
+\item{n_iters}{integer, default is NULL, number of iterations to run for}
 
-\item{repeats}{integer, default is 5, minimum value of 2,
+\item{repeats}{integer, default is 5, minimum value of 2
 number of repeats to use for ??}
 
 \item{distance}{string, default is "euclidean",

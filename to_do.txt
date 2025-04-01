@@ -8,11 +8,12 @@ add tests
 - multi view
 - restriction
 
+main
+-linters
+-main roxy
+
 add errors 
   -main
     - k max needs to be less than the rank
-    - data should be positive
-    - convert one view to list
 
-change Sil_score to bisil in script files etc.
 - use cases changing number of biclusters
