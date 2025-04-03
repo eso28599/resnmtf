@@ -9,7 +9,7 @@ obtain_biclusters(
   output_f,
   output_g,
   output_s,
-  repeats,
+  num_repeats,
   distance = "euclidean"
 )
 }
@@ -22,7 +22,7 @@ obtain_biclusters(
 
 \item{output_s}{list of S matrices}
 
-\item{repeats}{number of repeats}
+\item{num_repeats}{number of repeats in removing spurious biclusters}
 
 \item{distance}{distance metric to use, default is "euclidean".
 Can be "manhattan", "maximum", "canberra", "binary",

@@ -1,19 +1,7 @@
-add in package names in front of packages 
-  - dopar?
-change so you can specify whether to use parallel or not
-read me file 
-change stability so only use phi/xi to shuffle the same
-
 add tests
-- multi view
-- restriction
+- restriction matrix
 
-main
--linters
--main roxy
-
-add errors 
-  -main
-    - k max needs to be less than the rank
 
 - use cases changing number of biclusters
+
+read me file 

@@ -4,14 +4,14 @@
 \alias{get_thresholds}
 \title{Get thresholds}
 \usage{
-get_thresholds(x, output_f, repeats, n_views, n_clusts)
+get_thresholds(x, output_f, num_repeats, n_views, n_clusts)
 }
 \arguments{
 \item{x}{list of x matrices}
 
 \item{output_f}{list of F matrices}
 
-\item{repeats}{number of repeats}
+\item{num_repeats}{number of repeats in removing spurious biclusters}
 
 \item{n_views}{number of views}
 

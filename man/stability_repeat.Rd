@@ -13,7 +13,7 @@ stability_repeat(
   xi,
   psi,
   n_iters,
-  repeats,
+  num_repeats,
   distance,
   n_views,
   sample_rate
@@ -36,7 +36,7 @@ stability_repeat(
 
 \item{n_iters}{number of iterations}
 
-\item{repeats}{number of repeats}
+\item{num_repeats}{number of repeats in removing spurious biclusters}
 
 \item{distance}{distance metric to be used within res_nmtf_inner}
 

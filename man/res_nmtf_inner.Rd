@@ -14,7 +14,7 @@ res_nmtf_inner(
   xi = NULL,
   psi = NULL,
   n_iters = NULL,
-  repeats = 5,
+  num_repeats = 5,
   distance = "euclidean",
   no_clusts = FALSE
 )
@@ -38,8 +38,8 @@ res_nmtf_inner(
 
 \item{n_iters}{integer, default is NULL, number of iterations to run for}
 
-\item{repeats}{integer, default is 5, minimum value of 2
-number of repeats to use for ??}
+\item{num_repeats}{integer, default is 5, minimum value of 2
+number of num_repeats to use for ??}
 
 \item{distance}{string, default is "euclidean",
 distance metric to use within the bisilhouette score}

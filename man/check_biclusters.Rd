@@ -4,14 +4,14 @@
 \alias{check_biclusters}
 \title{Check biclusters}
 \usage{
-check_biclusters(data, output_f, repeats)
+check_biclusters(data, output_f, num_repeats)
 }
 \arguments{
 \item{data}{list of data matrices}
 
 \item{output_f}{list of F matrices}
 
-\item{repeats}{number of repeats}
+\item{num_repeats}{number of repeats in removing spurious biclusters}
 }
 \value{
 list containing the JSD scores,

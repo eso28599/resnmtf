@@ -12,7 +12,7 @@ stability_check(
   xi,
   psi,
   n_iters,
-  repeats,
+  num_repeats,
   no_clusts,
   distance,
   sample_rate = 0.9,
@@ -36,7 +36,7 @@ stability_check(
 
 \item{n_iters}{number of iterations}
 
-\item{repeats}{number of repeats}
+\item{num_repeats}{number of repeats in removing spurious biclusters}
 
 \item{no_clusts}{number of clusters}
 

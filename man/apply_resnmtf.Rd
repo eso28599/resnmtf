@@ -17,47 +17,49 @@ apply_resnmtf(
   k_min = 3,
   k_max = 8,
   distance = "euclidean",
-  repeats = 5,
+  num_repeats = 5,
   no_clusts = FALSE,
   sample_rate = 0.9,
   n_stability = 5,
   stability = TRUE,
   stab_thres = 0.4,
-  remove_unstable = TRUE
+  remove_unstable = TRUE,
+  use_parallel = TRUE
 )
 }
 \arguments{
-\item{data}{list of matrices, data to be factorised. If only one
+\item{data}{list of n_v matrices, data to be factorised. If only one
 view is supplied, can be given as a matrix.}
 
-\item{init_f}{list of matrices, initialisation for F matrices,}
+\item{init_f}{list of matrices, initialisation for F matrices}
 
-\item{init_s}{list of matrices, initialisation for S matrices,}
+\item{init_s}{list of matrices, initialisation for S matrices}
 
-\item{init_g}{list of matrices, initialisation for G matrices,}
+\item{init_g}{list of matrices, initialisation for G matrices}
 
 \item{k_vec}{vector of integers, number of clusters to consider
 in each view, default is NULL}
 
-\item{phi}{list of matrices, default is NULL, restriction matrices for F}
+\item{phi}{n_v x n_v matrix, default is NULL, restriction matrices for F}
 
-\item{xi}{list of matrices, default is NULL, restriction matrices for S}
+\item{xi}{n_v x n_v matrix, default is NULL, restriction matrices for S}
 
-\item{psi}{list of matrices, default is NULL, restriction matrices for G}
+\item{psi}{n_v x n_v matrix, default is NULL, restriction matrices for G}
 
-\item{n_iters}{integer, default is NULL, number of iterations to run for}
+\item{n_iters}{integer, default is NULL, number of iterations to run for,
+otherwise will run until convergence}
 
-\item{k_min}{integer, default is 3, must be greater than 1,
+\item{k_min}{positive integer, default is 3,
 smallest value of k to be considered initially,}
 
-\item{k_max}{integer, default is 6, must be greater than 2,
+\item{k_max}{positive integer, default is 6,
 largest value of k to be considered initially,}
 
 \item{distance}{string, default is "euclidean",
 distance metric to use within the bisilhouette score}
 
-\item{repeats}{integer, default is 5, minimum value of 2,
-number of repeats to use for ??}
+\item{num_repeats}{integer, default is 5,
+number of repeats to use within stability analysis}
 
 \item{no_clusts}{boolean, default is FALSE, whether to return
 only the factorisation or not,}
@@ -71,16 +73,31 @@ number of times to repeat stability analysis,}
 \item{stability}{boolean, default is TRUE,
 whether to perform stability analysis or not,}
 
-\item{stab_thres}{numeric, default is 0.4, threshold for stability analysis,
-#' @param remove_unstable boolean, default is TRUE,
+\item{stab_thres}{numeric, default is 0.4, threshold for stability analysis,}
+
+\item{remove_unstable}{boolean, default is TRUE,
 whether to remove unstable clusters or not}
+
+\item{use_parallel}{boolean, default is TRUE,
+wheather to use parallelisation,
+not applicable on Windows or linux machines}
 }
 \value{
-list of results from ResNMTF
+list of results from ResNMTF, containing the following:
+- output_f: list of matrices, F matrices
+- output_s: list of matrices, S matrices
+- output_g: list of matrices, G matrices
+- Error: numeric, mean error
+- All_Error: numeric, all errors
+- bisil: numeric, bisilhouette score
+- row_clusters: list of matrices, row clusters
+- col_clusters: list of matrices, column clusters
+- lambda: list of vectors, lambda vectors
+- mu: list of vectors, mu vectors
 }
 \description{
-Apply ResNMTF to data, with stability analysis and
-for a range of biclusters selecting the optimal number
+Apply ResNMTF to data for a range of biclusters selecting
+the optimal number, with optional stability analysis
 }
 \examples{
 data <- list(matrix(rnorm(100), nrow = 10), matrix(rnorm(100), nrow = 10))

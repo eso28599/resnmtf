@@ -1,10 +1,17 @@
 # ResNMTF
-Welcome to the landing page for the `resnmtf` package implementing Restrictive Non-Negative Matrix Tri-Factorisation from the paper "Multi-view biclustering via non-negative matrix tri-factorisation". 
+Welcome to the landing page for the `resnmtf` package implementing Restrictive Non-Negative Matrix Tri-Factorisation (ResNMTF) from the paper "Multi-view biclustering via non-negative matrix tri-factorisation". 
+
+ResNMTF is a flexible method which allows for any combination of shared rows and/or columns between views.
+
+![Illustration of views with shared rows and columns.](shared_rows_cols.png)
+
+It does this by factorising the data matrix for each view $X^{(v)}=F^{(v)}S^{(v)}(G^{(v)}^T)$
+![Figure illustrating ResNMTF factorisations.](resnmtf_figure.png)
 
 ## Installation 
 You can install this R package using the following line of code:
 ```{r}
-devtools::install_github("eso28599/bisilhouette") # requires devtools package to be installed
+devtools::install_github("eso28599/resnmtf") # requires devtools package to be installed
 ```
 
 ## Usage 
@@ -43,6 +50,18 @@ phi[1, 2] <- 1 # regularises towards shared rows between view 1 and view 2
 phi_val <- 200 # hyperparameter chosen to enforce regularisation
 results <- apply_resnmtf(data, phi = phi_val * phi)
 ```
+
+
+If the number of biclusters present in each view are known, this can be supplied via `k_vec`:
+```{r}
+results <- apply_resnmtf(data, k_vec = rep(3, 2), phi = phi_val * phi)
+```
+
+If instead you would like to change the range of biclusters considered initially ($3\leq k \leq 8$ by default), this can be implented via the `k_min` and `k_max` inputs:
+```{r}
+results <- apply_resnmtf(data, k_min = 4, k_max = 10, phi = phi_val * phi)
+```
+
 Notes:
 -  a non-zero `xi` restriction matrix also enforces the assumption that the scale of the biclusters is equal across views.
 -  the number of biclusters does not need to be specified, but will be determined by the bisilhouette score. 

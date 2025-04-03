@@ -135,27 +135,28 @@ res_nmtf_inner <- function(
 
 
 #' @title Apply ResNMTF
-#' @description Apply ResNMTF to data, with stability analysis and
-#'              for a range of biclusters selecting the optimal number
-#' @param data list of matrices, data to be factorised. If only one
+#' @description Apply ResNMTF to data for a range of biclusters selecting
+#'              the optimal number, with optional stability analysis
+#' @param data list of n_v matrices, data to be factorised. If only one
 #'             view is supplied, can be given as a matrix.
-#' @param init_f list of matrices, initialisation for F matrices,
-#' @param init_s list of matrices, initialisation for S matrices,
-#' @param init_g list of matrices, initialisation for G matrices,
+#' @param init_f list of matrices, initialisation for F matrices
+#' @param init_s list of matrices, initialisation for S matrices
+#' @param init_g list of matrices, initialisation for G matrices
 #' @param k_vec vector of integers, number of clusters to consider
 #'              in each view, default is NULL
-#' @param phi list of matrices, default is NULL, restriction matrices for F
-#' @param xi list of matrices, default is NULL, restriction matrices for S
-#' @param psi list of matrices, default is NULL, restriction matrices for G
-#' @param n_iters integer, default is NULL, number of iterations to run for
-#' @param k_max integer, default is 6, must be greater than 2,
+#' @param phi n_v x n_v matrix, default is NULL, restriction matrices for F
+#' @param xi n_v x n_v matrix, default is NULL, restriction matrices for S
+#' @param psi n_v x n_v matrix, default is NULL, restriction matrices for G
+#' @param n_iters integer, default is NULL, number of iterations to run for,
+#'                otherwise will run until convergence
+#' @param k_max positive integer, default is 6,
 #'              largest value of k to be considered initially,
-#' @param k_min integer, default is 3, must be greater than 1,
+#' @param k_min positive integer, default is 3,
 #'              smallest value of k to be considered initially,
 #' @param distance string, default is "euclidean",
 #'                 distance metric to use within the bisilhouette score
-#' @param num_repeats integer, default is 5, minimum value of 2,
-#'                number of num_repeats to use for ??
+#' @param num_repeats integer, default is 5,
+#'                number of repeats to use within stability analysis
 #' @param no_clusts boolean, default is FALSE, whether to return
 #'                  only the factorisation or not,
 #' @param sample_rate numeric, default is 0.9,
@@ -165,9 +166,22 @@ res_nmtf_inner <- function(
 #' @param stability boolean, default is TRUE,
 #'                  whether to perform stability analysis or not,
 #' @param stab_thres numeric, default is 0.4, threshold for stability analysis,
-#' #' @param remove_unstable boolean, default is TRUE,
+#' @param remove_unstable boolean, default is TRUE,
 #'                        whether to remove unstable clusters or not
-#' @return list of results from ResNMTF
+#' @param use_parallel boolean, default is TRUE,
+#'                     wheather to use parallelisation,
+#'                     not applicable on Windows or linux machines
+#' @return list of results from ResNMTF, containing the following:
+#'         - output_f: list of matrices, F matrices
+#'         - output_s: list of matrices, S matrices
+#'         - output_g: list of matrices, G matrices
+#'         - Error: numeric, mean error
+#'         - All_Error: numeric, all errors
+#'         - bisil: numeric, bisilhouette score
+#'         - row_clusters: list of matrices, row clusters
+#'         - col_clusters: list of matrices, column clusters
+#'         - lambda: list of vectors, lambda vectors
+#'         - mu: list of vectors, mu vectors
 #' @export
 #' @examples
 #' data <- list(matrix(rnorm(100), nrow = 10), matrix(rnorm(100), nrow = 10))
@@ -189,7 +203,8 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
                           no_clusts = FALSE,
                           sample_rate = 0.9, n_stability = 5,
                           stability = TRUE, stab_thres = 0.4,
-                          remove_unstable = TRUE) {
+                          remove_unstable = TRUE, use_parallel = TRUE) {
+  # check inputs (normalises data)
   data <- check_inputs(
     data, init_f, init_s,
     init_g, k_vec,
@@ -202,17 +217,12 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
     remove_unstable
   )
   n_v <- length(data)
-  data <- lapply(data, function(x) matrix_normalisation(x)$normalised_matrix)
   # initialise restriction matrices if not specified
-  # views with no restrictions require no input
   phi <- init_rest_mats(phi, n_v)
   psi <- init_rest_mats(psi, n_v)
   xi <- init_rest_mats(xi, n_v)
   # if number of clusters has been specified method can be applied straight away
   if ((!is.null(k_vec))) {
-    if (length(k_vec) != n_v) {
-      stop("k_vec must be a list of length equal to the number of views.")
-    }
     results <- res_nmtf_inner(
       data, init_f, init_s, init_g,
       k_vec, phi, xi, psi, n_iters,
@@ -237,7 +247,10 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
   ones_vec <- rep(1, n_v)
   # apply method for each k to be considered
   # if on windows or linux operating system - do normal for loop
-  if ((.Platform$OS.type == "windows") || (.Platform$OS.type == "unix")) {
+  if (
+    (.Platform$OS.type == "windows") || (.Platform$OS.type == "unix") ||
+      (!use_parallel)
+  ) {
     res_list <- vector("list", length = n_k)
     for (i in 1:n_k) {
       res_list[[i]] <- res_nmtf_inner(
@@ -268,13 +281,13 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
       max_k <- max_k + 1
       k_vec <- c(k_vec, max_k)
       k <- max_k * rep(1, n_v)
-      new_l <- length(k_vec)
-      res_list[[new_l]] <- res_nmtf_inner(
+      new_len <- length(k_vec)
+      res_list[[new_len]] <- res_nmtf_inner(
         data, init_f, init_s, init_g,
         k, phi, xi, psi, n_iters,
         num_repeats, distance, no_clusts
       )
-      err_list <- c(err_list, res_list[[new_l]][["bisil"]][1])
+      err_list <- c(err_list, res_list[[new_len]][["bisil"]][1])
       test <- k_vec[which.max(err_list)]
     }
   }

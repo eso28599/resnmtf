@@ -301,7 +301,8 @@ check_restriction_mat <- function(matrix, name) {
 }
 
 #' @title Check inputs
-#' @description Check if inputs are valid
+#' @description Check if inputs are valid,
+#'              normalises and forces data to be non-negative
 #' @param data list of matrices, data to be factorised
 #' @param init_f list of matrices, initialisation for F matrices
 #' @param init_s list of matrices, initialisation for S matrices
@@ -360,6 +361,8 @@ check_inputs <- function(data, init_f, init_s,
     warning("Data is not a double matrix. Converting to double.")
     data <- lapply(data, function(x) as.matrix(x))
   }
+  # normalise matrix
+  data <- lapply(data, function(x) matrix_normalisation(x)$normalised_matrix)
   ranks <- vapply(data, ncol, integer(1))
   # check if distance is a valid distance metric
   if (!distance %in% c("euclidean", "manhattan", "cosine")) {
