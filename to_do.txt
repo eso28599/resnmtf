@@ -1,7 +1,0 @@
-add tests
-- restriction matrix
-
-
-- use cases changing number of biclusters
-
-read me file 
