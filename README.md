@@ -72,8 +72,10 @@ results <- apply_resnmtf(data, k_min = 4, k_max = 10, phi = phi_val * phi)
 ```
 
 Notes:
+
 -  a non-zero `xi` restriction matrix also enforces the assumption that the scale of the biclusters is equal across views.
 -  the number of biclusters does not need to be specified, but will be determined by the bisilhouette score. 
+
 ### Results
 The multi-view biclustering is contained within two lists defining the row and column clusters associated with the biclusters. For a specific view, both are represented via binary logic matrices, with the $(i,j)^{th}$ element equal to $1$ if row/column $i$ belongs to bicluster $j$, and $0$ otherwise. 
 
