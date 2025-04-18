@@ -10,7 +10,6 @@ Roxygen: list(markdown = TRUE)
 Imports: 
     philentropy,
     MASS,
-    bisilhouette,
     doParallel,
     parallel,
     utils,
@@ -19,3 +18,5 @@ RoxygenNote: 7.3.2
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
+Remotes: 
+    github::eso18/bisilhouette
