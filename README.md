@@ -4,12 +4,12 @@ Welcome to the landing page for the `resnmtf` package implementing Restrictive N
 ResNMTF is a flexible method which allows for any combination of shared rows and/or columns between views. For example, if view 1 and 2 share columns and views 1, 3 and 4 share rows, as in the following figure, this can be incorporated.
 
 <p align="center">
-<img src="shared_rows_cols.png" alt="Illustration of views with shared rows and columns." width="500">
+<img src="man/figures/shared_rows_cols.png" alt="Illustration of views with shared rows and columns." width="500">
 </p>
 
 It does this by approximating the data matrix for each view  $X^{(v)}$ by the factorisation $F^{(v)}S^{(v)}{(G^{(v)})}^T$, as in the following image (for 3 views with shared rows):
 <p align="center">
-<img src="resnmtf_figure.png" alt="Figure illustrating ResNMTF factorisations." width="500">
+<img src="man/figures/resnmtf_figure.png" alt="Figure illustrating ResNMTF factorisations." width="500">
 </p>
 
 ## Installation 
