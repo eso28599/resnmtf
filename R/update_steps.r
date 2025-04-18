@@ -7,6 +7,7 @@
 #'              otherwise the restriction matrix is returned
 #' @param mat matrix to be initialised
 #' @param n_v number of views
+#' @noRd
 #' @return  restriction matrix, shape (n_v, n_v)
 init_rest_mats <- function(mat, n_v) {
   # inititialise phi/psi/xi matrices
@@ -26,6 +27,7 @@ init_rest_mats <- function(mat, n_v) {
 #' @param x list of input data
 #' @param k_vec vector of cluster dimension
 #' @param sigma noise parameter, default is 0.05
+#' @noRd
 #' @return a list of initial matrices, including
 #'         inif_f, init_g, init_s, init_lambda, init_mu
 init_mats <- function(x, k_vec, sigma = 0.05) {
@@ -75,6 +77,7 @@ init_mats <- function(x, k_vec, sigma = 0.05) {
 #' @param lambda_in lambda^(v) vector
 #' @param phi restriction matrix
 #' @param v index of the view
+#' @noRd
 #' @return updated F matrix
 update_f <- function(x, input_f, input_s, input_g, lambda_in, phi, v) {
   # Find numerator
@@ -109,6 +112,7 @@ update_f <- function(x, input_f, input_s, input_g, lambda_in, phi, v) {
 #' @param mu_in mu^(v) vector
 #' @param psi restriction matrix
 #' @param v index of the view
+#' @noRd
 #' @return updated G matrix
 update_g <- function(x, input_f, input_s, input_g, mu_in, psi, v) {
   # Find numerator
@@ -141,6 +145,7 @@ update_g <- function(x, input_f, input_s, input_g, mu_in, psi, v) {
 #' @param input_g G^(v) matrix
 #' @param xi restriction matrix
 #' @param v index of the view
+#' @noRd
 #' @return updated S matrix
 update_s <- function(x, input_f, input_s, input_g, xi, v) {
   # Find numerator and demoninator
@@ -168,6 +173,7 @@ update_s <- function(x, input_f, input_s, input_g, xi, v) {
 #'              and the current matrix factors
 #' @param vec vector to be updated
 #' @param matrix matrix factor to be used for update
+#' @noRd
 #' @return updated vector
 update_lm <- function(vec, matrix) {
   return(colSums(matrix) * vec)
@@ -187,6 +193,7 @@ update_lm <- function(vec, matrix) {
 #' @param xi restriction matrix for S
 #' @param psi restriction matrix for G
 #' @param n_iters number of iterations
+#' @noRd
 #' @return list containing, ouput_f, output_s, output_g, output_lam, output_mu
 update_matrices <- function(
     x, input_f, input_s, input_g, lambda, mu, phi, xi, psi, n_iters) {

@@ -11,6 +11,7 @@
 #' @param true_c true column clusters
 #' @param m number of row clusters
 #' @param n number of column clusters
+#' @noRd
 #' @return matrix of Jaccard indices
 jaccard_main <- function(row_c, col_c, true_r, true_c, m, n) {
   # initialise storage of jaccard index between pairs
@@ -39,6 +40,7 @@ jaccard_main <- function(row_c, col_c, true_r, true_c, m, n) {
 #' @param col_c column clusters
 #' @param true_r true row clusters
 #' @param true_c true column clusters
+#' @noRd
 #' @return vector of relevance values for each bicluster
 relevance_results <- function(row_c, col_c, true_r, true_c) {
   m <- ncol(row_c)
@@ -68,6 +70,7 @@ relevance_results <- function(row_c, col_c, true_r, true_c) {
 #' @description Test whether there are any columns/rows with only zeros
 #' @param data list of matrices to be tested
 #' @param attempt number of attempts made to sample data
+#' @noRd
 #' @return TRUE if any columns/rows with only zeros, FALSE otherwise
 test_cond <- function(data, attempt) {
   if (attempt == 1) {
@@ -84,6 +87,7 @@ test_cond <- function(data, attempt) {
 #' @title number of biclusters
 #' @description determine number of biclusters
 #' @param results results of apply_resnmtf/res_nmtf_inner
+#' @noRd
 #' @return number of biclusters
 number_biclusters <- function(results) {
   return(sum(as.numeric(lapply(
@@ -103,6 +107,7 @@ number_biclusters <- function(results) {
 #' @param sample_rate rate at which to sample
 #' @param row_samples list of rows to sample
 #' @param col_samples list of cols to sample
+#' @noRd
 initial_shuffle <- function(
     data, new_data, dims, dim, i,
     sample_rate, row_samples, col_samples) {
@@ -128,6 +133,7 @@ initial_shuffle <- function(
 #' @description check if matrix has any rows/columns with only zeros
 #' @param data list of matrices to be checked
 #' @param i index of the view to be checked
+#' @noRd
 #' @return TRUE if any rows/columns with only zeros, FALSE otherwise
 check_empty <- function(data, i) {
   return(any(colSums(data[[i]]) == 0) || any(rowSums(data[[i]]) == 0))
@@ -143,6 +149,7 @@ check_empty <- function(data, i) {
 #' @param row_samples list of rows to sample
 #' @param col_samples list of cols to sample
 #' @param sample_rate rate at which to sample
+#' @noRd
 #' @return list of shuffled matrices (new_data),
 #'         rows (row_samples) and columns (col_samples)
 sample_view <- function(data, i, new_data, dim_1,
@@ -196,6 +203,7 @@ sample_view <- function(data, i, new_data, dim_1,
 #' @param distance distance metric to be used within res_nmtf_inner
 #' @param n_views number of views
 #' @param sample_rate rate at which to sample
+#' @noRd
 #' @return matrix (i, j) of relevance values
 #'         for each bicluster (j) in each view (i)
 #'         and whether stability analysis was performed
@@ -271,6 +279,7 @@ stability_repeat <- function(results, data, dim_1, k, phi, xi, psi, n_iters,
 #' @param n_stability number of stability checks to perform
 #' @param stab_thres threshold for stability
 #' @param remove_unstable whether to remove unstable biclusters
+#' @noRd
 #' @return results of biclustering with unstable biclusters removed
 #'         (if applicable) or a list containing the initial results and
 #'         relevance values for each bicluster

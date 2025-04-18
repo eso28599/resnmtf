@@ -4,6 +4,7 @@
 
 #' @description makes a list of matrices non-negative
 #' @param x list of matrices
+#' @noRd
 #' @return list of non-negative matrices
 make_non_neg <- function(x) {
   return(lapply(x, make_non_neg_inner))
@@ -12,6 +13,7 @@ make_non_neg <- function(x) {
 #' @description makes a matrix non-negative
 #' @param matrix matrix to be made non-negative
 #' @return non-negative matrix
+#' @noRd
 #' @details This function adds the absolute value of the minimum element
 #'   of the matrix to each element of the matrix. This ensures that all
 #'   elements of the matrix are non-negative.
@@ -28,6 +30,7 @@ make_non_neg_inner <- function(matrix) {
 #' @param vec vector
 #' @param mat_list list of matrices
 #' @return matrix
+#' @noRd
 #' @details This function computes the product of a vector and a
 #'          list of matrices where the product is defined as the sum
 #'          of the product of each element of the vector
@@ -46,6 +49,7 @@ star_prod <- function(vec, mat_list) {
 #' @description normalises a matrix
 #' @param matrix matrix to be normalised
 #' @return list with two elements: normaliser and normalised_matrix
+#' @noRd
 #' @details This function normalises a matrix so that the l1 norm
 #'          of each column is 1.
 matrix_normalisation <- function(matrix) {
@@ -60,6 +64,7 @@ matrix_normalisation <- function(matrix) {
 #' @description Computes the Jensen-Shannon divergence between two vectors
 #' @param x1 first vector
 #' @param x2 second vector
+#' @noRd
 #' @return Jensen-Shannon divergence
 jsd_calc <- function(x1, x2) {
   max_val <- max(x1, x2)
@@ -78,6 +83,7 @@ jsd_calc <- function(x1, x2) {
 #' @param a first set
 #' @param b second set
 #' @return Jaccard similarity
+#' @noRd
 #' @details This function computes the Jaccard similarity between
 #'          two sets calculated as intersect(a,  b) / union(a, b).
 #'          The function returns 0 if the union of the two sets is empty.
@@ -96,6 +102,7 @@ jaccard_func <- function(a, b) {
 #' @description Computes the cartesian product of two sets
 #' @param a first set
 #' @param b second set
+#' @noRd
 #' @return a x b
 cart_prod <- function(a, b) {
   # returns cartesian product of two sets
@@ -118,6 +125,7 @@ cart_prod <- function(a, b) {
 #' @param current_s list of matrices, current S matrices
 #' @param current_g list of matrices, current G matrices
 #' @param n_v integer, number of views
+#' @noRd
 #' @return numeric vector, error for each view
 calculate_error <- function(data, current_f, current_s, current_g, n_v) {
   err <- c()
@@ -134,6 +142,7 @@ calculate_error <- function(data, current_f, current_s, current_g, n_v) {
 #' @param current_g list of matrices, current G matrices
 #' @param current_s list of matrices, current S matrices
 #' @param n_v integer, number of views
+#' @noRd
 #' @return list of matrices, normalised F, G and S matrices
 normalisation_check <- function(current_f, current_g, current_s, n_v) {
   for (v in 1:n_v) {
@@ -155,6 +164,7 @@ normalisation_check <- function(current_f, current_g, current_s, n_v) {
 #' @description Extract bisilhouette scores from results list
 #' @param res_list list of results from ResNMTF
 #' @param k_vec vector of integers
+#' @noRd
 #' @return vector of bisilhouette scores
 extract_bisils <- function(res_list, k_vec) {
   # extract scores
@@ -172,6 +182,7 @@ extract_bisils <- function(res_list, k_vec) {
 #' @title Check if
 #' @description Check if input is a positive integer
 #' @param x numeric, input to check
+#' @noRd
 check_whole_number <- function(x, name) {
   if (!is.numeric(x)) {
     stop(paste(name, " must be a numeric."))
@@ -189,6 +200,7 @@ check_whole_number <- function(x, name) {
 #' @param num_repeats integer, number of num_repeats to use
 #'                    for spurious bicluster removal
 #' @param n_stability integer, number of times to repeat stability analysis
+#' @noRd
 check_integers <- function(n_iters, k_min, k_max,
                            num_repeats,
                            n_stability) {
@@ -211,6 +223,7 @@ check_integers <- function(n_iters, k_min, k_max,
 #' @param no_clusts boolean, whether to return only the factorisation
 #' @param stability boolean, whether to perform stability analysis or not
 #' @param remove_unstable boolean, whether to remove unstable clusters or not
+#' @noRd
 check_boolean <- function(no_clusts,
                           stability, remove_unstable) {
   # check if boolean inputs are boolean
@@ -230,6 +243,7 @@ check_boolean <- function(no_clusts,
 #' @param sample_rate numeric, proportion of data to sample for
 #'                    stability analysis
 #' @param stab_thres numeric, threshold for stability analysis
+#' @noRd
 check_numeric <- function(sample_rate,
                           stab_thres) {
   # check if numeric inputs are numeric
@@ -254,6 +268,7 @@ check_numeric <- function(sample_rate,
 #' @param init_s list of matrices, initialisation for S matrices
 #' @param init_g list of matrices, initialisation for G matrices
 #' @return list of matrices, data to be factorised
+#' @noRd
 check_lists <- function(data, init_f, init_s, init_g) {
   # check if data is a list of matrices
   if (!is.list(data)) {
@@ -286,6 +301,7 @@ check_lists <- function(data, init_f, init_s, init_g) {
 #' @title Check restriction matrix
 #' @param matrix matrix, restriction matrix
 #' @param name string, name of the matrix
+#' @noRd
 check_restriction_mat <- function(matrix, name) {
   if (!is.null(matrix)) {
     if (!is.matrix(matrix)) {
@@ -331,6 +347,7 @@ check_restriction_mat <- function(matrix, name) {
 #' @param remove_unstable boolean, default is TRUE,
 #'                        whether to remove unstable clusters or not
 #' @return list of matrices, data to be factorised
+#' @noRd
 check_inputs <- function(data, init_f, init_s,
                          init_g, k_vec,
                          phi, xi, psi,

@@ -6,6 +6,7 @@
 #' @description shuffle a single view,
 #'              ensuring returned matrix has no rows or column with all zeros
 #' @param x_i matrix to shuffle
+#' @noRd
 #' @return shuffled matrix
 shuffle_view <- function(x_i) {
   dims <- dim(x_i)
@@ -23,6 +24,7 @@ shuffle_view <- function(x_i) {
 #' @param n_views number of views
 #' @param num_repeats number of repeats in removing spurious biclusters
 #' @param n_clusts number of biclusters
+#' @noRd
 #' @return list of shuffled F matrices
 obtain_shuffled_f <- function(data, n_views, num_repeats, n_clusts) {
   f_mess <- vector(mode = "list", length = num_repeats)
@@ -70,6 +72,7 @@ calculate_f_shuffle_jsd <- function(f_mess, i, j, num_repeats, n_clusts) {
 #' @param num_repeats number of repeats in removing spurious biclusters
 #' @param n_views number of views
 #' @param n_clusts number of biclusters
+#' @noRd
 #' @return list containing average and max scores, as well as the shuffled x
 get_thresholds <- function(x, output_f, num_repeats, n_views, n_clusts) {
   f_mess <- obtain_shuffled_f(x, n_views, num_repeats, n_clusts)
@@ -103,6 +106,7 @@ get_thresholds <- function(x, output_f, num_repeats, n_views, n_clusts) {
 #' @param num_repeats number of repeats in removing spurious biclusters
 #' @return list containing the JSD scores,
 #'             average and max thresholds
+#' @noRd
 check_biclusters <- function(data, output_f, num_repeats) {
   n_views <- length(data)
   n_clusts <- dim(output_f[[1]])[2]
@@ -137,6 +141,7 @@ check_biclusters <- function(data, output_f, num_repeats) {
 #'                 Can be "manhattan", "maximum", "canberra", "binary",
 #'                 "minkowski" or "pearson"
 #' @return list containing row and column clusterings,
+#' @noRd
 obtain_biclusters <- function(data, output_f,
                               output_g, output_s, num_repeats,
                               distance = "euclidean") {
