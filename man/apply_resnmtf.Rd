@@ -100,15 +100,22 @@ Apply ResNMTF to data for a range of biclusters selecting
 the optimal number, with optional stability analysis
 }
 \examples{
-data <- list(matrix(rnorm(100), nrow = 10), matrix(rnorm(100), nrow = 10))
-# if it is known there are 3 clusters in each view
-apply_resnmtf(data = data, k_vec = c(3, 3), n_iters = 100)
-# not performing stability analysis
-apply_resnmtf(data = data, stability = FALSE)
-# returning only the factorisation
-apply_resnmtf(data = data, no_clusts = TRUE)
-# changing the default range of k searched
-apply_resnmtf(data = data, k_min = 5, k_max = 10)
-# changing the distance metric
-apply_resnmtf(data = data, distance = "euclidean")
+row_clusters <- cbind(
+  rbinom(100, 1, 0.5),
+  rbinom(100, 1, 0.5),
+  rbinom(100, 1, 0.5)
+)
+col_clusters <- cbind(
+  rbinom(50, 1, 0.4),
+  rbinom(50, 1, 0.4),
+  rbinom(50, 1, 0.4)
+)
+n_col <- 50
+data <- list(
+  row_clusters \%*\% diag(c(5, 5, 5)) \%*\% t(col_clusters) +
+    abs(matrix(rnorm(100 * n_col), 100, n_col)),
+  row_clusters \%*\% diag(c(5, 5, 5)) \%*\% t(col_clusters) +
+    abs(0.01 * matrix(rnorm(100 * n_col), 100, n_col))
+)
+apply_resnmtf(data, k_max = 4)
 }
