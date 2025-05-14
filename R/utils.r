@@ -281,17 +281,17 @@ check_lists <- function(data, init_f, init_s, init_g) {
   # check if init_f, init_s, init_g are lists of matrices
   if (!is.null(init_f)) {
     print(init_f)
-    if (!is.list(init_f)) {
+    if (is.list(init_f)) {
       stop("init_f must be a list of matrices or NULL.")
     }
   }
   if (!is.null(init_s)) {
-    if (!is.list(init_s)) {
+    if (is.list(init_s)) {
       stop("init_s must be a list of matrices or NULL.")
     }
   }
   if (!is.null(init_g)) {
-    if (!is.list(init_g)) {
+    if (is.list(init_g)) {
       stop("init_g must be a list of matrices or NULL.")
     }
   }
