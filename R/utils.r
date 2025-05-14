@@ -302,7 +302,7 @@ check_lists <- function(data, init_f, init_s, init_g) {
 #' @param matrix matrix, restriction matrix
 #' @param name string, name of the matrix
 #' @noRd
-check_restriction_mat <- function(matrix, name) {
+check_restriction_mat <- function(data, matrix, name) {
   if (!is.null(matrix)) {
     if (!is.matrix(matrix)) {
       stop(paste(name, "must be a matrix or NULL."))
@@ -386,9 +386,9 @@ check_inputs <- function(data, init_f, init_s,
     stop("distance must be one of 'euclidean', 'manhattan' or 'cosine'.")
   }
   # check if phi, xi, psi are matrices
-  check_restriction_mat(phi, "phi")
-  check_restriction_mat(xi, "xi")
-  check_restriction_mat(psi, "psi")
+  check_restriction_mat(data, phi, "phi")
+  check_restriction_mat(data, xi, "xi")
+  check_restriction_mat(data, psi, "psi")
 
   # check if k_vec is a vector of integers
   if (!is.null(k_vec)) {
