@@ -310,7 +310,7 @@ check_restriction_mat <- function(matrix, name) {
     if (any(matrix < 0)) {
       stop(paste(name, " must be a non-negative matrix."))
     }
-    if (dim(matrix) != c(length(data), length(data))) {
+    if (any(dim(matrix) != c(length(data), length(data)))) {
       stop(paste(name, " must be of the same dimensions as data."))
     }
   }
