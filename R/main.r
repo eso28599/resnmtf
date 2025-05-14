@@ -212,6 +212,7 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
                           stability = TRUE, stab_thres = 0.4,
                           remove_unstable = TRUE, use_parallel = TRUE) {
   # initialise restriction matrices if not specified
+  n_v <- length(data)
   phi <- init_rest_mats(phi, n_v)
   psi <- init_rest_mats(psi, n_v)
   xi <- init_rest_mats(xi, n_v)
@@ -227,7 +228,6 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
     stability, stab_thres,
     remove_unstable
   )
-  n_v <- length(data)
   # if number of clusters has been specified method can be applied straight away
   if ((!is.null(k_vec))) {
     results <- res_nmtf_inner(
