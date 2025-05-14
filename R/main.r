@@ -214,8 +214,6 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
   # initialise restriction matrices if not specified
   n_v <- length(data)
   phi <- init_rest_mats(phi, n_v)
-  print(phi)
-  print(length(data))
   psi <- init_rest_mats(psi, n_v)
   xi <- init_rest_mats(xi, n_v)
   # check inputs (normalises data)
