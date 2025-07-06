@@ -13,7 +13,8 @@ Imports:
     doParallel,
     parallel,
     utils,
-    foreach
+    foreach, 
+    bisilhouette
 RoxygenNote: 7.3.2
 Suggests: 
     testthat (>= 3.0.0)

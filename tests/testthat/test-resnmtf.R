@@ -58,7 +58,7 @@ data <- list(
 )
 test_that("get warning for negative matrix", {
   expect_warning(
-    apply_resnmtf(-data[[1]], k_max = 4),
+    apply_resnmtf(list(-data[[1]]), k_max = 4),
     "Matrix is not non-negative. Has been made non-negative."
   )
 })
