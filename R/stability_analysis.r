@@ -225,7 +225,7 @@ stability_repeat <- function(results, data, dim_1, k, phi, xi, psi, n_iters,
     row_samples[[1]] <- sample(dim_1[1], (dim_1[1] * sample_rate))
     col_samples[[1]] <- sample(dim_1[2], (dim_1[2] * sample_rate))
     new_data[[1]] <- data[[1]][row_samples[[1]], col_samples[[1]]]
-    if (check_empty(data, 1)) {
+    if (check_empty(new_data, 1)) {
       zeros_cols <- colSums(new_data[[1]]) != 0
       zeros_rows <- rowSums(new_data[[1]]) != 0
       row_samples[[1]] <- row_samples[[1]][zeros_rows]
