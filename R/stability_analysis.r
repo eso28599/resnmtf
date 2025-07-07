@@ -161,7 +161,7 @@ sample_view <- function(data, i, new_data, dim_1,
   new_data <- shuffled[["new_data"]]
   row_samples <- shuffled[["row_samples"]]
   col_samples <- shuffled[["col_samples"]]
-  if (check_empty(data, i)) {
+  if (check_empty(new_data, i)) {
     zeros_cols <- colSums(new_data[[i]]) != 0
     zeros_rows <- rowSums(new_data[[i]]) != 0
     if ((dims[1]) == dim_1[1]) {
