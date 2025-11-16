@@ -9,7 +9,7 @@ the optimal number, with optional stability analysis"></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">resnmtf</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,6 +53,7 @@ the optimal number, with optional stability analysis</p>
 <span>  k_min <span class="op">=</span> <span class="fl">3</span>,</span>
 <span>  k_max <span class="op">=</span> <span class="fl">8</span>,</span>
 <span>  distance <span class="op">=</span> <span class="st">"euclidean"</span>,</span>
+<span>  spurious <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  num_repeats <span class="op">=</span> <span class="fl">5</span>,</span>
 <span>  no_clusts <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  sample_rate <span class="op">=</span> <span class="fl">0.9</span>,</span>
@@ -120,6 +121,11 @@ largest value of k to be considered initially,</p></dd>
 <dt id="arg-distance">distance<a class="anchor" aria-label="anchor" href="#arg-distance"></a></dt>
 <dd><p>string, default is "euclidean",
 distance metric to use within the bisilhouette score</p></dd>
+
+
+<dt id="arg-spurious">spurious<a class="anchor" aria-label="anchor" href="#arg-spurious"></a></dt>
+<dd><p>boolean, default is TRUE, whether or not spurious biclusters
+should be found and removed</p></dd>
 
 
 <dt id="arg-num-repeats">num_repeats<a class="anchor" aria-label="anchor" href="#arg-num-repeats"></a></dt>
@@ -913,7 +919,7 @@ not applicable on Windows or linux machines</p></dd>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>
