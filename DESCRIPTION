@@ -1,6 +1,6 @@
 Package: resnmtf
 Title: Determining a multi-view biclustering via ResNMTF
-Version: 0.0.1.1
+Version: 0.0.1.2
 Authors@R: 
     person("Ella", "Orme", , "eso18@ic.ac.uk", role = c("aut", "cre"))
 Description: The package provides functions for performing ResNMTF on multi-view data. ResNMTF is a multi-view biclustering approach based on non-negative matrix tri-factorization (NMTF) which allows for overlapping and non-exhaustive biclusters. It is a flexible approach which allows for any combination of restrictions betweeen views e.g. shared rows between 1st and 2nd views, shared columns between 1st and 3rd views, etc.

@@ -131,12 +131,15 @@ check_biclusters <- function(data, output_f, num_repeats) {
 
 #' @title Obtain biclusters
 #' @description obtain biclusters from ResNMTF factorisation,
-#'              removing those deemed to be spurious
+#'              removing those deemed to be spurious if desired
 #' @param data list of data matrices
 #' @param output_f list of F matrices
 #' @param output_g list of G matrices
 #' @param output_s list of S matrices
 #' @param num_repeats number of repeats in removing spurious biclusters
+#' @param remove_spurious boolean, default is TRUE.
+#'                        Whether or not spurious biclusters
+#'                        should be found and removed
 #' @param distance distance metric to use, default is "euclidean".
 #'                 Can be "manhattan", "maximum", "canberra", "binary",
 #'                 "minkowski" or "pearson"
@@ -144,13 +147,15 @@ check_biclusters <- function(data, output_f, num_repeats) {
 #' @noRd
 obtain_biclusters <- function(data, output_f,
                               output_g, output_s, num_repeats,
+                              remove_spurious = TRUE,
                               distance = "euclidean") {
   n_views <- length(output_f)
   row_clustering <- vector("list", length = n_views)
   col_clustering <- vector("list", length = n_views)
-
-  # assign biclusters
-  biclusts <- check_biclusters(data, output_f, num_repeats)
+  if (remove_spurious) {
+    # assign biclusters
+    biclusts <- check_biclusters(data, output_f, num_repeats)
+  }
   for (i in 1:n_views) {
     row_clustering[[i]] <- apply(
       output_f[[i]],
@@ -167,15 +172,17 @@ obtain_biclusters <- function(data, output_f,
   # set biclusters that aren't strong enough to 0
   # and if bicluster is empty set row and cols to 0
   for (i in 1:n_views) {
-    indices <- (
-      ((biclusts$score[i, ]) < biclusts$max_threshold[i]) |
-        ((biclusts$score[i, ]) == 0)
-    )
     relations <- apply(output_s[[i]], 2, which.max)
-    new_indices <- indices[relations] # i==0, col cluster i isn't a bicluster
     row_clustering[[i]] <- row_clustering[[i]][, relations]
-    row_clustering[[i]][, new_indices] <- 0
-    col_clustering[[i]][, new_indices] <- 0
+    if (remove_spurious) {
+      indices <- (
+        ((biclusts$score[i, ]) < biclusts$max_threshold[i]) |
+          ((biclusts$score[i, ]) == 0)
+      )
+      new_indices <- indices[relations] # i==0, col cluster i isn't a bicluster
+      row_clustering[[i]][, new_indices] <- 0
+      col_clustering[[i]][, new_indices] <- 0
+    }
     bisil <- c(
       bisil,
       bisilhouette::bisilhouette(

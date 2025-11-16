@@ -17,6 +17,7 @@ apply_resnmtf(
   k_min = 3,
   k_max = 8,
   distance = "euclidean",
+  spurious = TRUE,
   num_repeats = 5,
   no_clusts = FALSE,
   sample_rate = 0.9,
@@ -57,6 +58,9 @@ largest value of k to be considered initially,}
 
 \item{distance}{string, default is "euclidean",
 distance metric to use within the bisilhouette score}
+
+\item{spurious}{boolean, default is TRUE, whether or not spurious biclusters
+should be found and removed}
 
 \item{num_repeats}{integer, default is 5,
 number of repeats to use within stability analysis}

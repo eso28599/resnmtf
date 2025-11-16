@@ -223,9 +223,11 @@ check_integers <- function(n_iters, k_min, k_max,
 #' @param no_clusts boolean, whether to return only the factorisation
 #' @param stability boolean, whether to perform stability analysis or not
 #' @param remove_unstable boolean, whether to remove unstable clusters or not
+#' @param spurious boolean, whether or not spurious biclusters should be
+#'                 found and removed
 #' @noRd
 check_boolean <- function(no_clusts,
-                          stability, remove_unstable) {
+                          stability, remove_unstable, spurious) {
   # check if boolean inputs are boolean
   if (!is.logical(no_clusts)) {
     stop("no_clusts must be a boolean.")
@@ -235,6 +237,9 @@ check_boolean <- function(no_clusts,
   }
   if (!is.logical(remove_unstable)) {
     stop("remove_unstable must be a boolean.")
+  }
+  if (!is.logical(spurious)) {
+    stop("spurious must be a boolean.")
   }
 }
 
@@ -345,6 +350,8 @@ check_restriction_mat <- function(data, matrix, name) {
 #'                   threshold for stability analysis
 #' @param remove_unstable boolean, default is TRUE,
 #'                        whether to remove unstable clusters or not
+#' @param spurious boolean, whether or not spurious biclusters should be
+#'                 found and removed
 #' @return list of matrices, data to be factorised
 #' @noRd
 check_inputs <- function(data, init_f, init_s,
@@ -355,7 +362,7 @@ check_inputs <- function(data, init_f, init_s,
                          no_clusts,
                          sample_rate, n_stability,
                          stability, stab_thres,
-                         remove_unstable) {
+                         remove_unstable, spurious) {
   # check lists
   data <- check_lists(data, init_f, init_s, init_g)
   # check integer inputs
@@ -365,7 +372,7 @@ check_inputs <- function(data, init_f, init_s,
   )
   # check boolean
   check_boolean(
-    no_clusts, stability, remove_unstable
+    no_clusts, stability, remove_unstable, spurious
   )
   # check numeric
   check_numeric(

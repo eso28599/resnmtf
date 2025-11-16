@@ -201,6 +201,8 @@ sample_view <- function(data, i, new_data, dim_1,
 #' @param n_iters number of iterations
 #' @param num_repeats number of repeats in removing spurious biclusters
 #' @param distance distance metric to be used within res_nmtf_inner
+#' @param spurious boolean, whether or not spurious biclusters
+#'                 should be found and removed
 #' @param n_views number of views
 #' @param sample_rate rate at which to sample
 #' @noRd
@@ -209,7 +211,8 @@ sample_view <- function(data, i, new_data, dim_1,
 #'         and whether stability analysis was performed
 #'         (stability_performed)
 stability_repeat <- function(results, data, dim_1, k, phi, xi, psi, n_iters,
-                             num_repeats, distance, n_views, sample_rate) {
+                             num_repeats, distance, spurious,
+                             n_views, sample_rate) {
   new_data <- vector(mode = "list", length = n_views)
   row_samples <- vector(mode = "list", length = n_views)
   col_samples <- vector(mode = "list", length = n_views)
@@ -249,6 +252,7 @@ stability_repeat <- function(results, data, dim_1, k, phi, xi, psi, n_iters,
     k_vec = k * rep(1, n_views),
     phi = phi, xi = xi, psi = psi,
     n_iters = n_iters, num_repeats = num_repeats,
+    spurious = spurious,
     distance = distance
   )
   # extract results
@@ -272,6 +276,8 @@ stability_repeat <- function(results, data, dim_1, k, phi, xi, psi, n_iters,
 #' @param xi xi restriction parameter
 #' @param psi psi restriction parameter
 #' @param n_iters number of iterations
+#' @param spurious boolean, whether or not spurious biclusters
+#'              should be found and removed
 #' @param num_repeats number of repeats in removing spurious biclusters
 #' @param no_clusts number of clusters
 #' @param distance distance metric to be used within res_nmtf_inner
@@ -285,7 +291,8 @@ stability_repeat <- function(results, data, dim_1, k, phi, xi, psi, n_iters,
 #'         relevance values for each bicluster
 stability_check <- function(data, results,
                             k, phi, xi, psi, n_iters,
-                            num_repeats, no_clusts, distance, sample_rate = 0.9,
+                            spurious, num_repeats,
+                            no_clusts, distance, sample_rate = 0.9,
                             n_stability = 5, stab_thres = 0.6,
                             remove_unstable = TRUE) {
   # check whether stability check needs to be performed
@@ -300,7 +307,7 @@ stability_check <- function(data, results,
   for (t in 1:n_stability) {
     stab_repeat <- stability_repeat(
       results, data, dim_1, k, phi, xi, psi, n_iters,
-      num_repeats, distance, n_views, sample_rate
+      num_repeats, distance, spurious, n_views, sample_rate
     )
     relevance <- relevance + stab_repeat$relevance
     if (!stab_repeat$stability_performed) {

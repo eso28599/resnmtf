@@ -15,6 +15,7 @@ res_nmtf_inner(
   psi = NULL,
   n_iters = NULL,
   num_repeats = 5,
+  spurious = TRUE,
   distance = "euclidean",
   no_clusts = FALSE
 )
@@ -39,7 +40,10 @@ res_nmtf_inner(
 \item{n_iters}{integer, default is NULL, number of iterations to run for}
 
 \item{num_repeats}{integer, default is 5, minimum value of 2
-number of num_repeats to use for ??}
+number of num_repeats to use within spurious removal}
+
+\item{spurious}{boolean, default is TRUE, whether or not spurious biclusters
+should be found and removed}
 
 \item{distance}{string, default is "euclidean",
 distance metric to use within the bisilhouette score}

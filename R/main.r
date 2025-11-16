@@ -15,7 +15,9 @@
 #' @param psi list of matrices, default is NULL, restriction matrices for G
 #' @param n_iters integer, default is NULL, number of iterations to run for
 #' @param num_repeats integer, default is 5, minimum value of 2
-#'                number of num_repeats to use for ??
+#'                number of num_repeats to use within spurious removal
+#' @param spurious boolean, default is TRUE, whether or not spurious biclusters
+#'              should be found and removed
 #' @param distance string, default is "euclidean",
 #'                 distance metric to use within the bisilhouette score
 #' @param no_clusts boolean, default is FALSE,
@@ -26,7 +28,7 @@
 res_nmtf_inner <- function(
     data, init_f = NULL, init_s = NULL, init_g = NULL,
     k_vec = NULL, phi = NULL, xi = NULL, psi = NULL,
-    n_iters = NULL, num_repeats = 5, distance = "euclidean",
+    n_iters = NULL, num_repeats = 5, spurious = TRUE, distance = "euclidean",
     no_clusts = FALSE) {
   n_v <- length(data)
   # initialise F, S and G based on svd decomposition if not given
@@ -115,7 +117,7 @@ res_nmtf_inner <- function(
   # find clustering results and bisilhouette score
   clusters <- obtain_biclusters(
     data, current_f,
-    current_g, current_s, num_repeats, distance
+    current_g, current_s, num_repeats, spurious, distance
   )
   if (is.null(n_iters)) {
     error <- mean(utils::tail(total_err, n = 10))
@@ -155,6 +157,8 @@ res_nmtf_inner <- function(
 #'              smallest value of k to be considered initially,
 #' @param distance string, default is "euclidean",
 #'                 distance metric to use within the bisilhouette score
+#' @param spurious boolean, default is TRUE, whether or not spurious biclusters
+#'              should be found and removed
 #' @param num_repeats integer, default is 5,
 #'                number of repeats to use within stability analysis
 #' @param no_clusts boolean, default is FALSE, whether to return
@@ -206,7 +210,8 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
                           init_g = NULL, k_vec = NULL,
                           phi = NULL, xi = NULL, psi = NULL,
                           n_iters = NULL, k_min = 3, k_max = 8,
-                          distance = "euclidean", num_repeats = 5,
+                          distance = "euclidean", spurious = TRUE,
+                          num_repeats = 5,
                           no_clusts = FALSE,
                           sample_rate = 0.9, n_stability = 5,
                           stability = TRUE, stab_thres = 0.4,
@@ -226,14 +231,14 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
     no_clusts,
     sample_rate, n_stability,
     stability, stab_thres,
-    remove_unstable
+    remove_unstable, spurious
   )
   # if number of clusters has been specified method can be applied straight away
   if ((!is.null(k_vec))) {
     results <- res_nmtf_inner(
       data, init_f, init_s, init_g,
       k_vec, phi, xi, psi, n_iters,
-      num_repeats, distance, no_clusts
+      num_repeats, spurious, distance, no_clusts
     )
     # if using the original data, we want to perform stability analysis
     # otherwise we want the results
@@ -241,7 +246,8 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
       return(stability_check(
         data, results,
         k_vec, phi, xi, psi, n_iters,
-        num_repeats, no_clusts, distance, sample_rate,
+        spurious, num_repeats,
+        no_clusts, distance, sample_rate,
         n_stability, stab_thres
       ))
     } else {
@@ -263,7 +269,7 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
       res_list[[i]] <- res_nmtf_inner(
         data, init_f, init_s, init_g,
         k_vec[i] * ones_vec, phi, xi, psi, n_iters,
-        num_repeats, distance, no_clusts
+        num_repeats, spurious, distance, no_clusts
       )
     }
   } else {
@@ -273,7 +279,7 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
       res_nmtf_inner(
         data, init_f, init_s, init_g,
         k_vec[i] * ones_vec, phi, xi, psi, n_iters,
-        num_repeats, distance, no_clusts
+        num_repeats, spurious, distance, no_clusts
       )
     }
   }
@@ -292,7 +298,7 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
       res_list[[new_len]] <- res_nmtf_inner(
         data, init_f, init_s, init_g,
         k, phi, xi, psi, n_iters,
-        num_repeats, distance, no_clusts
+        num_repeats, spurious, distance, no_clusts
       )
       err_list <- c(err_list, res_list[[new_len]][["bisil"]][1])
       test <- k_vec[which.max(err_list)]
@@ -304,7 +310,8 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
     return(stability_check(
       data, results,
       k_vec[k], phi, xi, psi, n_iters,
-      num_repeats, no_clusts, distance,
+      spurious, num_repeats,
+      no_clusts, distance,
       sample_rate, n_stability,
       stab_thres, remove_unstable
     ))
