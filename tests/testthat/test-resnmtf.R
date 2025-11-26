@@ -224,6 +224,58 @@ test_that("Returned to order correctly.", {
 # -----------------------------
 # tests for naming functions
 # -----------------------------
+test_that(
+  "Row names missing, row restriction provided but dimensions don't match.",
+  {
+    data <- list(
+      abs(MASS::mvrnorm(10, mu = rep(0, 10), Sigma = diag(rep(1, 10)))),
+      abs(MASS::mvrnorm(20, mu = rep(0, 20), Sigma = diag(rep(1, 20))))
+    )
+    expect_error(
+      give_names(data, 2, phi = matrix(1, 2, 2)),
+      "Row restriction matrices implies shared rows between views
+               with differing number of unnamed rows. Please name rows."
+    )
+  }
+)
+test_that("Row names missing but row restriction provided.", {
+  data <- list(
+    abs(MASS::mvrnorm(10, mu = rep(0, 10), Sigma = diag(rep(1, 10)))),
+    abs(MASS::mvrnorm(10, mu = rep(0, 10), Sigma = diag(rep(1, 10))))
+  )
+  row_names <- give_names(data, 2, phi = matrix(1, 2, 2))
+  expect_equal(
+    row_names$row_names[[1]], row_names$row_names[[2]]
+  )
+})
+
+test_that(
+  "Column names missing, column restriction provided, dimensions don't match",
+  {
+    data <- list(
+      abs(MASS::mvrnorm(10, mu = rep(0, 10), Sigma = diag(rep(1, 10)))),
+      abs(MASS::mvrnorm(20, mu = rep(0, 20), Sigma = diag(rep(1, 20))))
+    )
+    expect_error(
+      give_names(data, 2, psi = matrix(1, 2, 2)),
+      "Column restriction matrices implies shared columns between
+            views with differing number of unnamed columns.
+            Please name columns."
+    )
+  }
+)
+
+test_that("Column names missing but column restriction provided.", {
+  data <- list(
+    abs(MASS::mvrnorm(10, mu = rep(0, 10), Sigma = diag(rep(1, 10)))),
+    abs(MASS::mvrnorm(10, mu = rep(0, 10), Sigma = diag(rep(1, 10))))
+  )
+  col_names <- give_names(data, 2, psi = matrix(1, 2, 2))
+  expect_equal(
+    col_names$col_names[[1]], col_names$col_names[[2]]
+  )
+})
+
 test_that("One row missing a name correctly detected.", {
   data <- list(
     abs(MASS::mvrnorm(10, mu = rep(0, 10), Sigma = diag(rep(1, 10)))),

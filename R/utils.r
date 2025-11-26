@@ -429,9 +429,11 @@ check_inputs <- function(data, init_f, init_s,
 #'              returns error if user input required
 #' @param data list of matrices, data to be factorised
 #' @param n_views integer, number of views
+#' @param phi restriction matrix for F matrices, default is NULL
+#' @param psi restriction matrix for G matrices, default is NULL
 #' @return list with three elements: data, row_names, col_names
 #' @noRd
-give_names <- function(data, n_views) {
+give_names <- function(data, n_views, phi = NULL, psi = NULL) {
   names_missing_rows <- sapply(data, function(x) is.null(rownames(x)))
   names_missing_cols <- sapply(data, function(x) is.null(colnames(x)))
   # if all rows aren't named - name
@@ -441,6 +443,19 @@ give_names <- function(data, n_views) {
       if (is.null(rownames(data[[i]]))) {
         rownames(data[[i]]) <- paste0("row_", n:(n - 1 + nrow(data[[i]])))
         n <- n + nrow(data[[i]])
+      }
+      # if restriction matrices provided, check number of rows match and
+      # assumes they are well aligned
+      if (!is.null(phi)) {
+        for (j in (min(i + 1, n_views)):n_views) {
+          if (phi[i, j] > 0 && nrow(data[[i]]) != nrow(data[[j]])) {
+            stop("Row restriction matrices implies shared rows between views
+               with differing number of unnamed rows. Please name rows.")
+          } else if (phi[i, j] > 0) {
+            # if restriction matrix implies shared rows, copy names
+            rownames(data[[j]]) <- rownames(data[[i]])
+          }
+        }
       }
     }
     # if some views are completely missing names, user must specify
@@ -455,11 +470,25 @@ give_names <- function(data, n_views) {
   }
   # now check columns
   if (all(names_missing_cols)) {
-    p <- 1
+    n <- 1
     for (i in 1:n_views) {
       if (is.null(colnames(data[[i]]))) {
-        colnames(data[[i]]) <- paste0("col_", p:(p - 1 + ncol(data[[i]])))
-        p <- p + ncol(data[[i]])
+        colnames(data[[i]]) <- paste0("col_", n:(n - 1 + ncol(data[[i]])))
+        n <- n + ncol(data[[i]])
+      }
+      # if restriction matrices provided, check number of rows match and
+      # assumes they are well aligned
+      if (!is.null(psi)) {
+        for (j in (min(i + 1, n_views)):n_views) {
+          if (psi[i, j] > 0 && ncol(data[[i]]) != ncol(data[[j]])) {
+            stop("Column restriction matrices implies shared columns between
+            views with differing number of unnamed columns.
+            Please name columns.")
+          } else if (psi[i, j] > 0) {
+            # if restriction matrix implies shared columns, copy names
+            colnames(data[[j]]) <- colnames(data[[i]])
+          }
+        }
       }
     }
   } else if (any(names_missing_cols)) {

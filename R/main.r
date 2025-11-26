@@ -210,17 +210,17 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
                           remove_unstable = TRUE, use_parallel = TRUE) {
   # initialise restriction matrices if not specified
   n_v <- length(data)
-  phi <- init_rest_mats(phi, n_v)
-  psi <- init_rest_mats(psi, n_v)
-  xi <- init_rest_mats(xi, n_v)
   # check naming
-  named_data <- give_names(data, n_v)
+  named_data <- give_names(data, n_v, phi, psi)
   og_row_names <- lapply(named_data$data, rownames)
   og_col_names <- lapply(named_data$data, colnames)
   # reorder data
   reordering <- reorder_data(
     named_data$data, n_v, named_data$row_names, named_data$col_names
   )
+  phi <- init_rest_mats(phi, n_v)
+  psi <- init_rest_mats(psi, n_v)
+  xi <- init_rest_mats(xi, n_v)
   # check inputs (normalises data)
   data <- check_inputs(
     reordering$data_reordered, init_f, init_s,
