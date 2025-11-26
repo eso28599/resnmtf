@@ -25,15 +25,60 @@ init_rest_mats <- function(mat, n_v) {
 #' @title initialise matrix factors
 #' @description initialise matrix factors F, S, G etc.
 #' @param x list of input data
+#' @param n_v number of views
 #' @param k_vec vector of cluster dimension
-#' @param sigma noise parameter, default is 0.05
+#' @param row_names list of row names for each view
+#' @param col_names list of column names for each view
 #' @noRd
 #' @return a list of initial matrices, including
 #'         inif_f, init_g, init_s, init_lambda, init_mu
-init_mats <- function(x, k_vec, sigma = 0.05) {
+init_mats <- function(
+    x, n_v, k_vec,
+    init_f, init_g, init_s) {
+  row_names <- lapply(x, rownames)
+  col_names <- lapply(x, colnames)
+  # initialise F, S and G based on svd decomposition if not given
+  if (is.null(init_f) || is.null(init_g) || is.null(init_s)) {
+    inits <- init_mats_inner(x, k_vec, row_names, col_names, n_v)
+    current_f <- inits$init_f
+    current_s <- inits$init_s
+    current_g <- inits$init_g
+    current_lam <- inits$init_lambda
+    current_mu <- inits$init_mu
+  } else {
+    # Take init_f, init_s, init_g as the initialised latent representations
+    # check if they are valid
+    current_f <- init_f
+    current_s <- init_s
+    current_g <- init_g
+    current_lam <- lapply(current_f, colSums)
+    current_mu <- lapply(current_g, colSums)
+    for (i in 1:n_v) {
+      rownames(current_f[[i]]) <- row_names[[i]]
+      rownames(current_g[[i]]) <- col_names[[i]]
+    }
+  }
+  return(list(
+    "current_f" = current_f, "current_g" = current_g, "current_s" = current_s,
+    "current_lam" = current_lam, "current_mu" = current_mu
+  ))
+}
+
+#' @title inner function to initialise matrix factors
+#' @description initialise matrix factors F, S, G etc.
+#' @param x list of input data
+#' @param k_vec vector of cluster dimension
+#' @param sigma noise parameter, default is 0.05
+#' @param row_names list of row names for each view
+#' @param col_names list of column names for each view
+#' @noRd
+#' @return a list of initial matrices, including
+#'         inif_f, init_g, init_s, init_lambda, init_mu
+init_mats_inner <- function(
+    x, k_vec, row_names, col_names, n_views,
+    sigma = 0.05) {
   #' X: list of input data
   # Initialisation of F, S, G lists
-  n_views <- length(x)
   init_f <- vector("list", length = n_views)
   init_s <- vector("list", length = n_views)
   init_g <- vector("list", length = n_views)
@@ -58,6 +103,9 @@ init_mats <- function(x, k_vec, sigma = 0.05) {
     init_s[[i]] <- (normal_f$normaliser) %*% init_s[[i]] %*% normal_g$normaliser
     init_lambda[[i]] <- colSums(init_f[[i]])
     init_mu[[i]] <- colSums(init_g[[i]])
+    # add row and column names
+    rownames(init_f[[i]]) <- row_names[[i]]
+    rownames(init_g[[i]]) <- col_names[[i]]
   }
 
   return(list(

@@ -16,6 +16,8 @@ shuffle_view <- function(x_i) {
   ) {
     x_messed <- matrix(sample(x_i), dims[1], dims[2])
   }
+  rownames(x_messed) <- paste0("temp_row_", 1:dims[1])
+  colnames(x_messed) <- paste0("temp_col_", 1:dims[2])
   return(x_messed)
 }
 
@@ -46,6 +48,7 @@ obtain_shuffled_f <- function(data, n_views, num_repeats, n_clusts) {
 #' @param num_repeats number of num_repeats
 #' @param n_clusts number of biclusters
 #' @return vector of JSD scores
+#' @noRd
 #' @details Calculate the JSD scores between the columns of the F matrix
 #'          of the ith view from the jth repeat,
 #'          for all columns from additional num_repeats
@@ -161,11 +164,12 @@ obtain_biclusters <- function(data, output_f,
       output_f[[i]],
       2, function(x) as.numeric(x > (1 / dim(output_f[[i]])[1]))
     )
-
+    rownames(row_clustering[[i]]) <- rownames(data[[i]])
     col_clustering[[i]] <- apply(
       output_g[[i]],
       2, function(x) as.numeric(x > (1 / dim(output_g[[i]])[1]))
     )
+    rownames(col_clustering[[i]]) <- colnames(data[[i]])
   }
   bisil <- c()
   # update realtions and

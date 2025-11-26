@@ -55,6 +55,7 @@ star_prod <- function(vec, mat_list) {
 matrix_normalisation <- function(matrix) {
   normaliser <- diag(colSums(matrix))
   normalised_matrix <- matrix %*% solve(normaliser)
+  colnames(normalised_matrix) <- colnames(matrix)
   return(list(
     "normaliser" = normaliser,
     "normalised_matrix" = normalised_matrix
@@ -417,4 +418,250 @@ check_inputs <- function(data, init_f, init_s,
     }
   }
   return(data)
+}
+
+# -----------------------------------------------
+# reordering and naming functions
+# -----------------------------------------------
+
+#' @title Give names to rows and columns
+#' @description Give names to rows and columns if not provided,
+#'              returns error if user input required
+#' @param data list of matrices, data to be factorised
+#' @param n_views integer, number of views
+#' @return list with three elements: data, row_names, col_names
+#' @noRd
+give_names <- function(data, n_views) {
+  names_missing_rows <- sapply(data, function(x) is.null(rownames(x)))
+  names_missing_cols <- sapply(data, function(x) is.null(colnames(x)))
+  # if all rows aren't named - name
+  if (all(names_missing_rows)) {
+    n <- 1
+    for (i in 1:n_views) {
+      if (is.null(rownames(data[[i]]))) {
+        rownames(data[[i]]) <- paste0("row_", n:(n - 1 + nrow(data[[i]])))
+        n <- n + nrow(data[[i]])
+      }
+    }
+    # if some views are completely missing names, user must specify
+  } else if (any(names_missing_rows)) {
+    stop("At least one view is missing row names. Please name missing rows.")
+  } else {
+    # if some rows are missing names within a view but others are provided
+    # user must specify
+    if (any(sapply(data, function(x) any(is.na(rownames(x)))))) {
+      stop("Some rows missing names. Check row names.")
+    }
+  }
+  # now check columns
+  if (all(names_missing_cols)) {
+    p <- 1
+    for (i in 1:n_views) {
+      if (is.null(colnames(data[[i]]))) {
+        colnames(data[[i]]) <- paste0("col_", p:(p - 1 + ncol(data[[i]])))
+        p <- p + ncol(data[[i]])
+      }
+    }
+  } else if (any(names_missing_cols)) {
+    stop(
+      "At least one view is missing column names. Please name missing columns."
+    )
+  } else {
+    # if any columns are missing names
+    if (any(sapply(data, function(x) any(is.na(colnames(x)))))) {
+      stop("Some columns missing names. Check columns names.")
+    }
+  }
+  return(list(
+    "data" = data,
+    "row_names" = lapply(data, rownames),
+    "col_names" = lapply(data, colnames)
+  ))
+}
+
+#' @title Produce indices of shared rows and columns
+#' @description Produce indices of shared rows and columns
+#' @param row_lists list of vectors, lists of row names for each existing
+#'                  view subset
+#' @param col_lists list of vectors, lists of column names for each existing
+#'                  view subset
+#' @param existing_view_subsets_r list of vectors, lists of existing
+#'                                view subsets for rows
+#' @param existing_view_subsets_c list of vectors, lists of existing
+#'                                view subsets for columns
+#' @param n_views integer, number of views
+#' @return list with two elements: shared_rows, shared_cols.
+#'         Each element is a list corresponding to a view where each entrie
+#'         is a hash where the keys are the other views and
+#'         the values are the shared row/column names between the two views.
+#' @noRd
+produce_indices <- function(
+    row_lists, col_lists,
+    existing_view_subsets_r, existing_view_subsets_c, n_views) {
+  shared_rows <- vector("list", length = n_views)
+  shared_cols <- vector("list", length = n_views)
+  for (view1 in 1:n_views) {
+    shared_v1 <- hash::hash()
+    shared_c_v1 <- hash::hash()
+    for (view2 in (1:3)[-view1]) {
+      common_rows <- unlist(
+        row_lists[
+          sapply(
+            existing_view_subsets_r,
+            function(x) all(c(view1, view2) %in% x)
+          )
+        ]
+      )
+      common_cols <- unlist(
+        col_lists[
+          sapply(
+            existing_view_subsets_c,
+            function(x) all(c(view1, view2) %in% x)
+          )
+        ]
+      )
+      if (length(common_rows) != 0) {
+        shared_v1[[as.character(view2)]] <- common_rows
+      } else {
+        shared_v1[[as.character(view2)]] <- NA
+      }
+      if (length(common_cols) != 0) {
+        shared_c_v1[[as.character(view2)]] <- common_rows
+      } else {
+        shared_c_v1[[as.character(view2)]] <- NA
+      }
+    }
+    shared_rows[[view1]] <- shared_v1
+    shared_cols[[view1]] <- shared_c_v1
+  }
+  return(list("shared_rows" = shared_rows, "shared_cols" = shared_cols))
+}
+
+#' @title Reorder data
+#' @description Reorder data so that rows and columns belonging to the same
+#'              view subsets are grouped together
+#' @param data list of matrices, data to be factorised
+#' @param n_views integer, number of views
+#' @param row_names list of vectors, row names for each view
+#' @param col_names list of vectors, column names for each view
+#' @return list with six elements:
+#'         data_reordered: list of matrices,
+#'          reordered data grouped by view subsets
+#'         existing_view_subsets_r:
+#'          list of existing view subsets for rows
+#'         existing_view_subsets_c:
+#'          list of existing view subsets for columns
+#'         row_indices: a list where each element is a hash corresponding to a
+#'          view, where the keys are the other views and
+#'          the values are the shared row names between the two views.
+#'         col_indices:
+#'           a list where each element is a hash corresponding to a
+#'          view, where the keys are the other views and
+#'          the values are the shared column names between the two views
+#'         row_lists:
+#'          list of vectors of row names for each view ordered by view subsets
+#'         col_lists:
+#'          list of vectors of column names for each view ordered
+#'          by view subsets
+#' @noRd
+reorder_data <- function(data, n_views, row_names, col_names) {
+  # for each view v, find R^(v) - the list of existing view subsets A for view v
+  # define relevant power set, not including the empty subset
+  # a row is in existing view subset A
+  power_set <- rje::powerSetCond(1:n_views)
+  existing_view_subsets_r <- list()
+  existing_view_subsets_c <- list()
+  row_lists <- list()
+  col_lists <- list()
+  # extract relevant row_names
+  for (views in power_set) {
+    # define {1, ..., n} \ A
+    negate_v_sub <- (1:n_views)[!((1:n_views) %in% views)]
+    # find rows belonging to views v in A
+    rows <- Reduce(intersect, row_names[views])
+    # find rows belonging to views v not in A
+    rows_negation <- Reduce(union, row_names[negate_v_sub])
+    # select the rows present in A but not in {1, ..., n} \ A
+    rows_in_a <- setdiff(rows, rows_negation)
+    if (length(rows_in_a) != 0) {
+      existing_view_subsets_r <- c(existing_view_subsets_r, list(views))
+      row_lists <- c(row_lists, list(rows_in_a))
+    }
+    # find cols belonging to views v in A
+    cols <- Reduce(intersect, col_names[views])
+    # find cols belonging to views v not in A
+    cols_negation <- Reduce(union, col_names[negate_v_sub])
+    # select the cols present in A but not in {1, ..., n} \ A
+    cols_in_a <- setdiff(cols, cols_negation)
+    if (length(cols_in_a) != 0) {
+      existing_view_subsets_c <- c(existing_view_subsets_c, list(views))
+      col_lists <- c(col_lists, list(cols_in_a))
+    }
+  }
+
+  # reorder_data
+  data_reordered <- vector("list", length = n_views)
+  row_orders <- list()
+  col_orders <- list()
+  for (view in 1:n_views) {
+    row_order <- unlist(
+      row_lists[sapply(existing_view_subsets_r, function(x) view %in% x)]
+    )
+    col_order <- unlist(
+      col_lists[sapply(existing_view_subsets_c, function(x) view %in% x)]
+    )
+    data_reordered[[view]] <- data[[view]][row_order, col_order]
+    row_orders <- c(row_orders, list(row_order))
+    col_orders <- c(col_orders, list(col_order))
+  }
+
+  indices <- produce_indices(
+    row_lists, col_lists,
+    existing_view_subsets_r, existing_view_subsets_c, n_views
+  )
+  return(list(
+    "data_reordered" = data_reordered,
+    "existing_view_subsets_r" = existing_view_subsets_r,
+    "existing_view_subsets_c" = existing_view_subsets_c,
+    "row_indices" = indices$shared_rows,
+    "col_indices" = indices$shared_cols,
+    "row_lists" = row_lists,
+    "col_lists" = col_lists
+  ))
+}
+
+#' @title Reorder results to original order
+#' @description Reorder results to original order, inner function
+#' @param results list of results from ResNMTF
+#' @param names list of vectors, names for each view
+#' @param n_views integer, number of views
+#' @return list of results from ResNMTF reordered to original order
+#' @noRd
+original_order_inner <- function(result, names, n_views) {
+  for (view in 1:n_views) {
+    result[[view]] <- result[[view]][names[[view]], ]
+  }
+  return(result)
+}
+
+#' @title Reorder results to original order
+#' @description Reorder results to original order
+#' @param results list of results from ResNMTF
+#' @param row_names list of vectors, row names for each view
+#' @param col_names list of vectors, column names for each view
+#' @param n_views integer, number of views
+#' @return list of results from ResNMTF reordered to original order
+#' @noRd
+original_order <- function(results, row_names, col_names, n_views) {
+  results$output_f <- original_order_inner(results$output_f, row_names, n_views)
+  results$output_g <- original_order_inner(results$output_g, col_names, n_views)
+  results$row_clusters <- original_order_inner(
+    results$row_clusters,
+    row_names, n_views
+  )
+  results$col_clusters <- original_order_inner(
+    results$col_clusters,
+    col_names, n_views
+  )
+  return(results)
 }

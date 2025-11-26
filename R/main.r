@@ -31,23 +31,15 @@ res_nmtf_inner <- function(
     n_iters = NULL, num_repeats = 5, spurious = TRUE, distance = "euclidean",
     no_clusts = FALSE) {
   n_v <- length(data)
-  # initialise F, S and G based on svd decomposition if not given
-  if (is.null(init_f) || is.null(init_g) || is.null(init_s)) {
-    inits <- init_mats(data, k_vec)
-    current_f <- inits$init_f
-    current_s <- inits$init_s
-    current_g <- inits$init_g
-    current_lam <- inits$init_lambda
-    current_mu <- inits$init_mu
-  } else {
-    # Take init_f, init_s, init_g as the initialised latent representations
-    # check if they are valid
-    current_f <- init_f
-    current_s <- init_s
-    current_g <- init_g
-    current_lam <- lapply(current_f, colSums)
-    current_mu <- lapply(current_g, colSums)
-  }
+  initial_mats <- init_mats(
+    data, n_v, k_vec,
+    init_f, init_g, init_s
+  )
+  current_f <- initial_mats$current_f
+  current_s <- initial_mats$current_s
+  current_g <- initial_mats$current_g
+  current_lam <- initial_mats$current_lam
+  current_mu <- initial_mats$current_mu
   # Update until convergence, or for n_iters times
   if (is.null(n_iters)) {
     total_err <- c()
@@ -221,9 +213,17 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
   phi <- init_rest_mats(phi, n_v)
   psi <- init_rest_mats(psi, n_v)
   xi <- init_rest_mats(xi, n_v)
+  # check naming
+  named_data <- give_names(data, n_v)
+  og_row_names <- lapply(named_data$data, rownames)
+  og_col_names <- lapply(named_data$data, colnames)
+  # reorder data
+  reordering <- reorder_data(
+    named_data$data, n_v, named_data$row_names, named_data$col_names
+  )
   # check inputs (normalises data)
   data <- check_inputs(
-    data, init_f, init_s,
+    reordering$data_reordered, init_f, init_s,
     init_g, k_vec,
     phi, xi, psi,
     n_iters, k_min, k_max,
@@ -243,16 +243,16 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
     # if using the original data, we want to perform stability analysis
     # otherwise we want the results
     if (stability) {
-      return(stability_check(
+      results <- stability_check(
         data, results,
         k_vec, phi, xi, psi, n_iters,
         spurious, num_repeats,
         no_clusts, distance, sample_rate,
         n_stability, stab_thres
-      ))
-    } else {
-      return(results)
+      )
     }
+    results <- original_order(results, og_row_names, og_col_names, n_v)
+    return(results)
   }
   # define set of k_s to consider
   k_vec <- k_min:k_max
@@ -307,15 +307,15 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
   k <- which.max(err_list)
   results <- res_list[[k]]
   if (stability) {
-    return(stability_check(
+    results <- stability_check(
       data, results,
       k_vec[k], phi, xi, psi, n_iters,
       spurious, num_repeats,
       no_clusts, distance,
       sample_rate, n_stability,
       stab_thres, remove_unstable
-    ))
-  } else {
-    return(results)
+    )
   }
+  results <- original_order(results, og_row_names, og_col_names, n_v)
+  return(results)
 }

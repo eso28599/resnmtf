@@ -122,6 +122,8 @@ initial_shuffle <- function(
     col_samples[[i]] <- sample(dims[2], (dims[2] * sample_rate))
   }
   new_data[[i]] <- data[[i]][row_samples[[i]], col_samples[[i]]]
+  rownames(new_data[[i]]) <- rownames(data[[i]])[row_samples[[i]]]
+  colnames(new_data[[i]]) <- colnames(data[[i]])[col_samples[[i]]]
   return(list(
     "new_data" = new_data,
     "row_samples" = row_samples,
@@ -234,6 +236,8 @@ stability_repeat <- function(results, data, dim_1, k, phi, xi, psi, n_iters,
       row_samples[[1]] <- row_samples[[1]][zeros_rows]
       col_samples[[1]] <- col_samples[[1]][zeros_cols]
       new_data[[1]] <- data[[1]][row_samples[[1]], col_samples[[1]]]
+      rownames(new_data[[1]]) <- rownames(data[[1]])[row_samples[[1]]]
+      colnames(new_data[[1]]) <- colnames(data[[1]])[col_samples[[1]]]
     }
     if (n_views > 1) {
       for (i in 2:n_views) {
