@@ -8,6 +8,8 @@ number of biclusters
 ``` r
 res_nmtf_inner(
   data,
+  row_indices,
+  column_indices,
   init_f = NULL,
   init_s = NULL,
   init_g = NULL,
@@ -27,7 +29,12 @@ res_nmtf_inner(
 
 - data:
 
-  list of matrices, data to be factorised
+  list of matrices, data to be factorised \#' @param row_indices list of
+  relevant row indices from all other views for each view
+
+- column_indices:
+
+  list of relevant column indices from all other views for each view
 
 - init_f:
 

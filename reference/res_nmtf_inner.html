@@ -9,7 +9,7 @@ for a specific number of biclusters"></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">resnmtf</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,6 +42,8 @@ for a specific number of biclusters</p>
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">res_nmtf_inner</span><span class="op">(</span></span>
 <span>  <span class="va">data</span>,</span>
+<span>  <span class="va">row_indices</span>,</span>
+<span>  <span class="va">column_indices</span>,</span>
 <span>  init_f <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  init_s <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  init_g <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -62,7 +64,14 @@ for a specific number of biclusters</p>
 
 
 <dl><dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
-<dd><p>list of matrices, data to be factorised</p></dd>
+<dd><p>list of matrices, data to be factorised
+#' @param row_indices list of relevant row indices from all other views
+for each view</p></dd>
+
+
+<dt id="arg-column-indices">column_indices<a class="anchor" aria-label="anchor" href="#arg-column-indices"></a></dt>
+<dd><p>list of relevant column indices from all other views
+for each view</p></dd>
 
 
 <dt id="arg-init-f">init_f<a class="anchor" aria-label="anchor" href="#arg-init-f"></a></dt>

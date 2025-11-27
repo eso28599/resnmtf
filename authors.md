@@ -7,13 +7,13 @@
 ## Citation
 
 Orme E (2025). *resnmtf: Determining a multi-view biclustering via
-ResNMTF*. R package version 2.0.0.0,
+ResNMTF*. R package version 2.0.0.1,
 <https://eso28599.github.io/resnmtf/>.
 
     @Manual{,
       title = {resnmtf: Determining a multi-view biclustering via ResNMTF},
       author = {Ella Orme},
       year = {2025},
-      note = {R package version 2.0.0.0},
+      note = {R package version 2.0.0.1},
       url = {https://eso28599.github.io/resnmtf/},
     }
