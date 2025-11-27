@@ -268,8 +268,8 @@ stability_repeat <- function(results, data, dim_1, k, phi, xi, psi, n_iters,
   # extract results
   for (i in 1:n_views) {
     relevance[i, ] <- relevance[i, ] + relevance_results(
-      new_results$row_clusters[[i]][row_samples[[i]], ],
-      new_results$col_clusters[[i]][col_samples[[i]], ],
+      new_results$row_clusters[[i]][, ],
+      new_results$col_clusters[[i]][, ],
       results$row_clusters[[i]][row_samples[[i]], ],
       results$col_clusters[[i]][col_samples[[i]], ]
     )

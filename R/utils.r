@@ -69,11 +69,11 @@ star_prod_relevant <- function(vec, mat_list, current_mat, indices) {
       rows <- indices[[as.character(i)]]
       if (!any(is.na(rows))) {
         masked_matrix[rows, ] <- mat_list[[i]][rows, ]
-        vec_mat <- vec_mat + vec[i] * masked_matrix
+        vec_mat <- vec_mat + vec[i] * masked_matrix * length(rows)
       }
     }
   }
-  return(vec_mat)
+  return(vec_mat / nrow(current_mat))
 }
 
 #' @description normalises a matrix
@@ -83,8 +83,13 @@ star_prod_relevant <- function(vec, mat_list, current_mat, indices) {
 #' @details This function normalises a matrix so that the l1 norm
 #'          of each column is 1.
 matrix_normalisation <- function(matrix) {
-  normaliser <- diag(colSums(matrix))
-  normalised_matrix <- matrix %*% solve(normaliser)
+  # normaliser <- diag(colSums(matrix))
+  # normalised_matrix <- matrix %*% solve(normaliser)
+  normaliser <- diag(1 / colSums(matrix))
+  normalised_matrix <- matrix %*% normaliser
+  # if (sum(normalised_matrix) != (dim(matrix)[2])) {
+  #   print("Normalisation failed.")
+  # }
   colnames(normalised_matrix) <- colnames(matrix)
   return(list(
     "normaliser" = normaliser,
@@ -162,7 +167,8 @@ calculate_error <- function(data, current_f, current_s, current_g, n_v) {
   err <- c()
   for (v in 1:n_v) {
     x_hat <- current_f[[v]] %*% current_s[[v]] %*% t(current_g[[v]])
-    err <- c(err, sum((data[[v]] - x_hat)**2) / sum((data[[v]])**2))
+    # err <- c(err, sum((data[[v]] - x_hat)**2) / sum((data[[v]])**2))
+    err <- c(err, norm((data[[v]] - x_hat), "F")**2 / norm((data[[v]]), "F")**2)
   }
   return(err)
 }

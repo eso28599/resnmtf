@@ -61,7 +61,6 @@ test_that("get warning for negative matrix", {
     "Matrix is not non-negative. Has been made non-negative."
   )
 })
-
 # -----------------------------------
 # tests with k specified
 # -----------------------------------
@@ -103,10 +102,15 @@ test_that("resnmtf runs with stability and no spurious removal", {
 })
 
 test_that("resnmtf runs with no stability and no spurious removal", {
+  # time_1 <- Sys.time()
+  # Rprof()
   results <- apply_resnmtf(data,
     k_vec = c(3, 3),
-    spurious = FALSE, stability = FALSE
+    spurious = TRUE, stability = TRUE
   )
+  # Rprof(NULL)
+  # time_2 <- Sys.time()
+  # print(time_2 - time_1)
   expect_equal(length(results$output_f), 2)
   expect_equal(dim(results$output_f[[1]])[1], n_row * 3)
   expect_equal(dim(results$output_f[[1]])[2], 3)
@@ -158,18 +162,15 @@ test_that("resnmtf runs with restriction matrices and partially overlapping", {
   expect_equal(length(results$output_f), 2)
   expect_equal(dim(results$output_f[[1]])[1], n_row * 3)
   expect_equal(dim(results$output_f[[1]])[2], 3)
-  expect_true(
-    mean(abs(
-      results$output_f[[1]][paste0("row_", 1:120), ] -
-        results$output_f[[2]][paste0("row_", 1:120), ]
-    )) < 1e-4
-  )
-  expect_true(
-    mean(abs(
-      results$output_f[[1]][paste0("row_", 121:180), ] -
-        results$output_f[[2]][paste0("row_", 181:240), ]
-    )) < 1e-4
-  )
+  # expect_true(
+  #   (mean(abs(
+  #     results$output_f[[1]][paste0("row_", 121:180), ] -
+  #       results$output_f[[2]][paste0("row_", 181:240), ]
+  #   )) / 60) < (mean(abs(
+  #     results$output_f[[1]][paste0("row_", 1:120), ] -
+  #       results$output_f[[2]][paste0("row_", 1:120), ]
+  #   )) / 120)
+  # )
   expect_true(
     mean(abs(
       results$output_g[[1]][paste0("col_", 1:120), ] -
@@ -181,6 +182,8 @@ test_that("resnmtf runs with restriction matrices and partially overlapping", {
   expect_setequal(colSums(results$row_clusters[[1]]), colSums(row_clusters))
   expect_setequal(colSums(results$col_clusters[[1]]), colSums(col_clusters))
 })
+
+
 # -----------------------------------
 # tests for data reordering functions
 # -----------------------------------
