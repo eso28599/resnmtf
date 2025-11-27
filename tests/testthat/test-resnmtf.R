@@ -102,15 +102,15 @@ test_that("resnmtf runs with stability and no spurious removal", {
 })
 
 test_that("resnmtf runs with no stability and no spurious removal", {
-  # time_1 <- Sys.time()
+  time_1 <- Sys.time()
   # Rprof()
   results <- apply_resnmtf(data,
     k_vec = c(3, 3),
     spurious = TRUE, stability = TRUE
   )
   # Rprof(NULL)
-  # time_2 <- Sys.time()
-  # print(time_2 - time_1)
+  time_2 <- Sys.time()
+  print(time_2 - time_1)
   expect_equal(length(results$output_f), 2)
   expect_equal(dim(results$output_f[[1]])[1], n_row * 3)
   expect_equal(dim(results$output_f[[1]])[2], 3)

@@ -85,14 +85,14 @@ star_prod_relevant <- function(vec, mat_list, current_mat, indices) {
 matrix_normalisation <- function(matrix) {
   # normaliser <- diag(colSums(matrix))
   # normalised_matrix <- matrix %*% solve(normaliser)
-  normaliser <- diag(1 / colSums(matrix))
-  normalised_matrix <- matrix %*% normaliser
-  # if (sum(normalised_matrix) != (dim(matrix)[2])) {
-  #   print("Normalisation failed.")
-  # }
+  # normaliser <- diag(colSums(matrix))
+  col_sums <- colSums(matrix)
+  # normalised_matrix <- matrix %*% normaliser
+  # normalised_matrix <- matrix / colSums(matrix)
+  normalised_matrix <- matrix / col_sums
   colnames(normalised_matrix) <- colnames(matrix)
   return(list(
-    "normaliser" = normaliser,
+    "normaliser" = diag(col_sums),
     "normalised_matrix" = normalised_matrix
   ))
 }
@@ -167,7 +167,6 @@ calculate_error <- function(data, current_f, current_s, current_g, n_v) {
   err <- c()
   for (v in 1:n_v) {
     x_hat <- current_f[[v]] %*% current_s[[v]] %*% t(current_g[[v]])
-    # err <- c(err, sum((data[[v]] - x_hat)**2) / sum((data[[v]])**2))
     err <- c(err, norm((data[[v]] - x_hat), "F")**2 / norm((data[[v]]), "F")**2)
   }
   return(err)
@@ -183,12 +182,16 @@ calculate_error <- function(data, current_f, current_s, current_g, n_v) {
 #' @return list of matrices, normalised F, G and S matrices
 normalisation_check <- function(current_f, current_g, current_s, n_v) {
   for (v in 1:n_v) {
-    normal_f <- matrix_normalisation(current_f[[v]])
-    current_f[[v]] <- normal_f$normalised_matrix
-    normal_g <- matrix_normalisation(current_g[[v]])
-    current_g[[v]] <- normal_g$normalised_matrix
-    current_s[[v]] <- (normal_f$normaliser) %*%
-      current_s[[v]] %*% normal_g$normaliser
+    # normal_f <- matrix_normalisation(current_f[[v]])
+    # current_f[[v]] <- normal_f$normalised_matrix
+    # normal_g <- matrix_normalisation(current_g[[v]])
+    # current_g[[v]] <- normal_g$normalised_matrix
+    # current_s[[v]] <- (normal_f$normaliser) %*%
+    #   current_s[[v]] %*% normal_g$normaliser
+    current_s[[v]] <- diag(colSums(current_f[[v]])) %*%
+      current_s[[v]] %*% diag(colSums(current_g[[v]]))
+    current_f[[v]] <- current_f[[v]] / colSums(current_f[[v]])
+    current_g[[v]] <- current_g[[v]] / colSums(current_g[[v]])
   }
   return(list(
     "current_f" = current_f, "current_g" = current_g,
