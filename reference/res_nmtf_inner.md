@@ -29,8 +29,11 @@ res_nmtf_inner(
 
 - data:
 
-  list of matrices, data to be factorised \#' @param row_indices list of
-  relevant row indices from all other views for each view
+  list of matrices, data to be factorised
+
+- row_indices:
+
+  list of relevant row indices from all other views for each view
 
 - column_indices:
 
