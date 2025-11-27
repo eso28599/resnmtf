@@ -6,7 +6,7 @@
 #' @description Apply ResNMTF to data, without stability analysis and
 #'              for a specific number of biclusters
 #' @param data list of matrices, data to be factorised
-#' #' @param row_indices list of relevant row indices from all other views
+#' @param row_indices list of relevant row indices from all other views
 #'                    for each view
 #' @param column_indices list of relevant column indices from all other views
 #'    for each view

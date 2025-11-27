@@ -23,8 +23,9 @@ res_nmtf_inner(
 )
 }
 \arguments{
-\item{data}{list of matrices, data to be factorised
-#' @param row_indices list of relevant row indices from all other views
+\item{data}{list of matrices, data to be factorised}
+
+\item{row_indices}{list of relevant row indices from all other views
 for each view}
 
 \item{column_indices}{list of relevant column indices from all other views
