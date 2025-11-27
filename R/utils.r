@@ -46,6 +46,36 @@ star_prod <- function(vec, mat_list) {
   return(vec_mat)
 }
 
+#' @description Computes the product of a vector and a list of the
+#'              relevant rows of matrices
+#' @param vec vector
+#' @param mat_list list of matrices
+#' @param current_mat matrix of required dimension
+#' @param indices list of indices to consider for each matrix in mat_list
+#' @return matrix
+#' @noRd
+#' @details This function computes the product of a vector and a
+#'          list of matrices where the product is defined as the sum
+#'          of the product of each element of the vector
+#'          with the relevant rows (as given by indices) of the corresponding
+#'          matrix in the list. The function
+#'          returns a matrix of the same dimensions as the entries in the list.
+star_prod_relevant <- function(vec, mat_list, current_mat, indices) {
+  vec_mat <- 0
+  for (i in seq_len(length(vec))) {
+    if (vec[i] != 0) {
+      masked_matrix <- matrix(0, nrow(current_mat), ncol(current_mat))
+      rownames(masked_matrix) <- rownames(current_mat)
+      rows <- indices[[as.character(i)]]
+      if (!any(is.na(rows))) {
+        masked_matrix[rows, ] <- mat_list[[i]][rows, ]
+        vec_mat <- vec_mat + vec[i] * masked_matrix
+      }
+    }
+  }
+  return(vec_mat)
+}
+
 #' @description normalises a matrix
 #' @param matrix matrix to be normalised
 #' @return list with two elements: normaliser and normalised_matrix

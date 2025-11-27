@@ -115,6 +115,7 @@ test_that("resnmtf runs with no stability and no spurious removal", {
   expect_setequal(colSums(results$row_clusters[[1]]), colSums(row_clusters))
   expect_setequal(colSums(results$col_clusters[[1]]), colSums(col_clusters))
 })
+
 # -----------------------------------
 # tests with k not specified
 # -----------------------------------
@@ -132,6 +133,54 @@ test_that("resnmtf runs with k not specified", {
   expect_setequal(colSums(results$col_clusters[[1]]), colSums(col_clusters))
 })
 
+# -----------------------------------
+# tests with restriction matrices
+# -----------------------------------
+test_that("resnmtf runs with restriction matrices and partially overlapping", {
+  row_names <- list(
+    paste0("row_", 1:180),
+    c(paste0("row_", 1:120), paste0("row_", 181:240))
+  )
+  col_names <- list(
+    paste0("col_", 1:180),
+    c(paste0("col_", 1:120), paste0("row_", 181:240))
+  )
+  for (view in 1:2) {
+    rownames(data[[view]]) <- row_names[[view]]
+    colnames(data[[view]]) <- col_names[[view]]
+  }
+  rest_mat <- matrix(0, 2, 2)
+  rest_mat[1, 2] <- 1000
+  results <- apply_resnmtf(data,
+    k_vec = c(3, 3), phi = rest_mat, rest_mat,
+    spurious = FALSE, stability = FALSE
+  )
+  expect_equal(length(results$output_f), 2)
+  expect_equal(dim(results$output_f[[1]])[1], n_row * 3)
+  expect_equal(dim(results$output_f[[1]])[2], 3)
+  expect_true(
+    mean(abs(
+      results$output_f[[1]][paste0("row_", 1:120), ] -
+        results$output_f[[2]][paste0("row_", 1:120), ]
+    )) < 1e-4
+  )
+  expect_true(
+    mean(abs(
+      results$output_f[[1]][paste0("row_", 121:180), ] -
+        results$output_f[[2]][paste0("row_", 181:240), ]
+    )) < 1e-4
+  )
+  expect_true(
+    mean(abs(
+      results$output_g[[1]][paste0("col_", 1:120), ] -
+        results$output_g[[2]][paste0("col_", 1:120), ]
+    )) < 1e-4
+  )
+  expect_setequal(colSums(results$row_clusters[[2]]), colSums(row_clusters))
+  expect_setequal(colSums(results$col_clusters[[2]]), colSums(col_clusters))
+  expect_setequal(colSums(results$row_clusters[[1]]), colSums(row_clusters))
+  expect_setequal(colSums(results$col_clusters[[1]]), colSums(col_clusters))
+})
 # -----------------------------------
 # tests for data reordering functions
 # -----------------------------------

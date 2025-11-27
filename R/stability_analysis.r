@@ -251,8 +251,14 @@ stability_repeat <- function(results, data, dim_1, k, phi, xi, psi, n_iters,
     }
     attempt <- attempt + 1
   }
+  reordered_new <- reorder_data(
+    new_data, n_views,
+    lapply(new_data, rownames), lapply(new_data, colnames)
+  )
   new_results <- res_nmtf_inner(
-    new_data,
+    reordered_new$data_reordered,
+    reordered_new$row_indices,
+    reordered_new$col_indices,
     k_vec = k * rep(1, n_views),
     phi = phi, xi = xi, psi = psi,
     n_iters = n_iters, num_repeats = num_repeats,
@@ -262,8 +268,8 @@ stability_repeat <- function(results, data, dim_1, k, phi, xi, psi, n_iters,
   # extract results
   for (i in 1:n_views) {
     relevance[i, ] <- relevance[i, ] + relevance_results(
-      new_results$row_clusters[[i]],
-      new_results$col_clusters[[i]],
+      new_results$row_clusters[[i]][row_samples[[i]], ],
+      new_results$col_clusters[[i]][col_samples[[i]], ],
       results$row_clusters[[i]][row_samples[[i]], ],
       results$col_clusters[[i]][col_samples[[i]], ]
     )

@@ -125,9 +125,12 @@ init_mats_inner <- function(
 #' @param lambda_in lambda^(v) vector
 #' @param phi restriction matrix
 #' @param v index of the view
+#' @param row_indices list of relevant row indices from all other views
 #' @noRd
 #' @return updated F matrix
-update_f <- function(x, input_f, input_s, input_g, lambda_in, phi, v) {
+update_f <- function(
+    x, input_f, input_s, input_g, lambda_in, phi,
+    v, row_indices) {
   # Find numerator
   current_f <- input_f[[v]]
   numerator_matrix <- x %*% input_g %*% t(input_s)
@@ -140,7 +143,7 @@ update_f <- function(x, input_f, input_s, input_g, lambda_in, phi, v) {
     output_f <- current_f *
       ((numerator_matrix) / (denominator_matrix + lambda_mat))
   } else {
-    num_mat_prod <- star_prod(phi_vec, input_f)
+    num_mat_prod <- star_prod_relevant(phi_vec, input_f, current_f, row_indices)
     denom_mat_prod <- sum(phi_vec) * current_f
     output_f <- current_f * (
       (numerator_matrix + num_mat_prod) /
@@ -160,9 +163,12 @@ update_f <- function(x, input_f, input_s, input_g, lambda_in, phi, v) {
 #' @param mu_in mu^(v) vector
 #' @param psi restriction matrix
 #' @param v index of the view
+#' @param column_indices list of relevant column indices from all other views
 #' @noRd
 #' @return updated G matrix
-update_g <- function(x, input_f, input_s, input_g, mu_in, psi, v) {
+update_g <- function(
+    x, input_f, input_s, input_g, mu_in, psi,
+    v, column_indices) {
   # Find numerator
   current_g <- input_g[[v]]
   numerator_matrix <- t(x) %*% input_f %*% input_s
@@ -174,7 +180,10 @@ update_g <- function(x, input_f, input_s, input_g, mu_in, psi, v) {
     output_g <- current_g * (numerator_matrix / (denominator_matrix + mu_mat))
   } else {
     psi_vec <- (psi + t(psi))[, v]
-    num_mat_prod <- star_prod(psi_vec, input_g)
+    num_mat_prod <- star_prod_relevant(
+      psi_vec, input_g, current_g,
+      column_indices
+    )
     denom_mat_prod <- sum(psi_vec) * current_g
     output_g <- current_g * (
       (numerator_matrix + num_mat_prod) /
@@ -240,11 +249,15 @@ update_lm <- function(vec, matrix) {
 #' @param phi restriction matrix for F
 #' @param xi restriction matrix for S
 #' @param psi restriction matrix for G
-#' @param n_iters number of iterations
+#' @param row_indices list of relevant row indices from all other views
+#'                    for each view
+#' @param column_indices list of relevant column indices from all other views
+#'    for each view
 #' @noRd
 #' @return list containing, ouput_f, output_s, output_g, output_lam, output_mu
 update_matrices <- function(
-    x, input_f, input_s, input_g, lambda, mu, phi, xi, psi, n_iters) {
+    x, input_f, input_s, input_g, lambda, mu, phi, xi, psi,
+    row_indices, column_indices) {
   n_v <- length(x)
   current_f <- input_f
   current_s <- input_s
@@ -261,7 +274,8 @@ update_matrices <- function(
       input_g = current_g[[v]],
       lambda_in = currentlam[[v]],
       phi = phi,
-      v = v
+      v = v,
+      row_indices = row_indices[[v]]
     )
     # Update G
     current_g[[v]] <- update_g(
@@ -270,7 +284,8 @@ update_matrices <- function(
       input_s = current_s[[v]],
       input_g = current_g,
       mu_in = currentmu[[v]],
-      psi = psi, v = v
+      psi = psi, v = v,
+      column_indices = column_indices[[v]]
     )
     # Update S
     current_s[[v]] <- update_s(
