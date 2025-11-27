@@ -221,9 +221,7 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
   n_v <- length(data)
   # check naming
   named_data <- give_names(data, n_v, phi, psi)
-  og_row_names <- lapply(named_data$data, rownames)
-  og_col_names <- lapply(named_data$data, colnames)
-  # reorder data
+  # get data indices
   reordering <- reorder_data(
     named_data$data, n_v, named_data$row_names, named_data$col_names
   )
@@ -232,7 +230,7 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
   xi <- init_rest_mats(xi, n_v)
   # check inputs (normalises data)
   data <- check_inputs(
-    reordering$data_reordered, init_f, init_s,
+    named_data$data, init_f, init_s,
     init_g, k_vec,
     phi, xi, psi,
     n_iters, k_min, k_max,
@@ -261,7 +259,6 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
         n_stability, stab_thres
       )
     }
-    results <- original_order(results, og_row_names, og_col_names, n_v)
     return(results)
   }
   # define set of k_s to consider
@@ -329,6 +326,5 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
       stab_thres, remove_unstable
     )
   }
-  results <- original_order(results, og_row_names, og_col_names, n_v)
   return(results)
 }

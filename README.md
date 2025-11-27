@@ -19,6 +19,10 @@ You can install this R package using the following line of code:
 devtools::install_github("eso28599/resnmtf") # requires devtools package to be installed
 ```
 
+<div style="border-left: 4px solid #ED2939; padding: 0.5em; background: #efe5e3;">
+  <strong>Important:</strong> This package benefits from the speed ups provided by using a non-"reference" version of BLAS (a library to perform standard mathematical operations). It's really easy to use a quicker version, see [here](https://higgicd.github.io/posts/accelerating_r/) for an example. 
+</div>
+
 ## Usage 
 To demonstrate the use of `resnmtf` we generate toy data with 2 views and 3 biclusters, assuming biclusters share rows across views, but do not share columns. View 1 has dimensions $100 \times 50$ and view 2, $100 \times 30$.
 

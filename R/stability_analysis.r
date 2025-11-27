@@ -256,7 +256,7 @@ stability_repeat <- function(results, data, dim_1, k, phi, xi, psi, n_iters,
     lapply(new_data, rownames), lapply(new_data, colnames)
   )
   new_results <- res_nmtf_inner(
-    reordered_new$data_reordered,
+    new_data,
     reordered_new$row_indices,
     reordered_new$col_indices,
     k_vec = k * rep(1, n_views),

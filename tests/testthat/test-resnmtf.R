@@ -102,15 +102,10 @@ test_that("resnmtf runs with stability and no spurious removal", {
 })
 
 test_that("resnmtf runs with no stability and no spurious removal", {
-  time_1 <- Sys.time()
-  # Rprof()
   results <- apply_resnmtf(data,
     k_vec = c(3, 3),
-    spurious = TRUE, stability = TRUE
+    spurious = FALSE, stability = FALSE
   )
-  # Rprof(NULL)
-  time_2 <- Sys.time()
-  print(time_2 - time_1)
   expect_equal(length(results$output_f), 2)
   expect_equal(dim(results$output_f[[1]])[1], n_row * 3)
   expect_equal(dim(results$output_f[[1]])[2], 3)
@@ -147,7 +142,7 @@ test_that("resnmtf runs with restriction matrices and partially overlapping", {
   )
   col_names <- list(
     paste0("col_", 1:180),
-    c(paste0("col_", 1:120), paste0("row_", 181:240))
+    c(paste0("col_", 1:120), paste0("col_", 181:240))
   )
   for (view in 1:2) {
     rownames(data[[view]]) <- row_names[[view]]
@@ -162,115 +157,28 @@ test_that("resnmtf runs with restriction matrices and partially overlapping", {
   expect_equal(length(results$output_f), 2)
   expect_equal(dim(results$output_f[[1]])[1], n_row * 3)
   expect_equal(dim(results$output_f[[1]])[2], 3)
-  # expect_true(
-  #   (mean(abs(
-  #     results$output_f[[1]][paste0("row_", 121:180), ] -
-  #       results$output_f[[2]][paste0("row_", 181:240), ]
-  #   )) / 60) < (mean(abs(
-  #     results$output_f[[1]][paste0("row_", 1:120), ] -
-  #       results$output_f[[2]][paste0("row_", 1:120), ]
-  #   )) / 120)
-  # )
   expect_true(
-    mean(abs(
+    (mean(abs(
+      results$output_f[[1]][paste0("row_", 121:180), ] -
+        results$output_f[[2]][paste0("row_", 181:240), ]
+    ))) > (mean(abs(
+      results$output_f[[1]][paste0("row_", 1:120), ] -
+        results$output_f[[2]][paste0("row_", 1:120), ]
+    )))
+  )
+  expect_true(
+    (mean(abs(
+      results$output_g[[1]][paste0("col_", 121:180), ] -
+        results$output_g[[2]][paste0("col_", 181:240), ]
+    ))) > (mean(abs(
       results$output_g[[1]][paste0("col_", 1:120), ] -
         results$output_g[[2]][paste0("col_", 1:120), ]
-    )) < 1e-4
+    )))
   )
   expect_setequal(colSums(results$row_clusters[[2]]), colSums(row_clusters))
   expect_setequal(colSums(results$col_clusters[[2]]), colSums(col_clusters))
   expect_setequal(colSums(results$row_clusters[[1]]), colSums(row_clusters))
   expect_setequal(colSums(results$col_clusters[[1]]), colSums(col_clusters))
-})
-
-
-# -----------------------------------
-# tests for data reordering functions
-# -----------------------------------
-# generate output
-data <- list(
-  abs(MASS::mvrnorm(10, mu = rep(0, 10), Sigma = diag(rep(1, 10)))),
-  abs(MASS::mvrnorm(10, mu = rep(0, 10), Sigma = diag(rep(1, 10))))
-)
-row_names <- list(paste0("row_", 1:10), paste0("row_", 5:14))
-col_names <- list(paste0("col_", 1:10), paste0("col_", 5:14))
-n_views <- 2
-for (view in 1:n_views) {
-  rownames(data[[view]]) <- row_names[[view]]
-  colnames(data[[view]]) <- col_names[[view]]
-}
-reordered_list <- reorder_data(data, n_views, row_names, col_names)
-
-# perform tests
-test_that("Row partition implemented correctly.", {
-  expect_equal(length(Reduce(intersect, reordered_list$row_lists)), 0)
-  expect_true(setequal(
-    Reduce(union, reordered_list$row_lists),
-    Reduce(union, row_names)
-  ))
-})
-test_that("Column partition implemented correctly.", {
-  expect_equal(length(Reduce(intersect, reordered_list$col_lists)), 0)
-  expect_true(setequal(
-    Reduce(union, reordered_list$col_lists),
-    Reduce(union, col_names)
-  ))
-})
-test_that("Row reordering implemented correctly.", {
-  for (view in 1:n_views) {
-    expect_setequal(
-      rownames(data[[view]]),
-      rownames(reordered_list$data_reordered[[view]])
-    )
-  }
-})
-test_that("Column reordering implemented correctly.", {
-  for (view in 1:n_views) {
-    expect_setequal(
-      colnames(data[[view]]),
-      colnames(reordered_list$data_reordered[[view]])
-    )
-  }
-})
-
-test_that("Returned to order correctly.", {
-  n_col <- 60
-  n_row <- 60
-  row_clusters <- matrix(0, 3 * n_row, 3)
-  col_clusters <- matrix(0, 3 * n_col, 3)
-  for (i in 1:3) {
-    row_clusters[((i - 1) * n_row + 1):(i * n_row), i] <- 1
-    col_clusters[((i - 1) * n_col + 1):(i * n_col), i] <- 1
-  }
-
-  data <- list(
-    row_clusters %*% diag(c(10, 10, 10)) %*% t(col_clusters) +
-      0.1 * abs(matrix(rnorm(9 * n_row * n_col), 3 * n_row, 3 * n_col)),
-    row_clusters %*% diag(c(10, 10, 10)) %*% t(col_clusters) +
-      0.1 * abs(matrix(rnorm(9 * n_row * n_col), 3 * n_row, 3 * n_col))
-  )
-  row_names <- list(
-    paste0("row_", 1:180),
-    c(paste0("row_", 1:120), paste0("row_", 181:240))
-  )
-  col_names <- list(
-    paste0("col_", 1:180),
-    c(paste0("col_", 1:120), paste0("row_", 181:240))
-  )
-  for (view in 1:2) {
-    rownames(data[[view]]) <- row_names[[view]]
-    colnames(data[[view]]) <- col_names[[view]]
-  }
-  results <- apply_resnmtf(data,
-    k_vec = c(3, 3),
-    spurious = FALSE, stability = FALSE
-  )
-  for (i in 1:2) {
-    expect_equal(rownames(results$output_f[[i]]), row_names[[i]])
-    expect_equal(rownames(results$output_g[[i]]), col_names[[i]])
-    expect_equal(rownames(results$row_clusters[[i]]), row_names[[i]])
-    expect_equal(rownames(results$col_clusters[[i]]), col_names[[i]])
-  }
 })
 
 # -----------------------------

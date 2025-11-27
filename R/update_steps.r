@@ -18,6 +18,7 @@ init_rest_mats <- function(mat, n_v) {
     return(matrix(0, nrow = n_v, ncol = n_v))
   } else {
     # If not NULL, return the input matrix (validate the existing matrix)
+    diag(mat) <- 0 # ensure diagonal is zero
     return(mat)
   }
 }

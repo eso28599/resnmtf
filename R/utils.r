@@ -83,12 +83,7 @@ star_prod_relevant <- function(vec, mat_list, current_mat, indices) {
 #' @details This function normalises a matrix so that the l1 norm
 #'          of each column is 1.
 matrix_normalisation <- function(matrix) {
-  # normaliser <- diag(colSums(matrix))
-  # normalised_matrix <- matrix %*% solve(normaliser)
-  # normaliser <- diag(colSums(matrix))
   col_sums <- colSums(matrix)
-  # normalised_matrix <- matrix %*% normaliser
-  # normalised_matrix <- matrix / colSums(matrix)
   normalised_matrix <- matrix / col_sums
   colnames(normalised_matrix) <- colnames(matrix)
   return(list(
@@ -182,12 +177,6 @@ calculate_error <- function(data, current_f, current_s, current_g, n_v) {
 #' @return list of matrices, normalised F, G and S matrices
 normalisation_check <- function(current_f, current_g, current_s, n_v) {
   for (v in 1:n_v) {
-    # normal_f <- matrix_normalisation(current_f[[v]])
-    # current_f[[v]] <- normal_f$normalised_matrix
-    # normal_g <- matrix_normalisation(current_g[[v]])
-    # current_g[[v]] <- normal_g$normalised_matrix
-    # current_s[[v]] <- (normal_f$normaliser) %*%
-    #   current_s[[v]] %*% normal_g$normaliser
     current_s[[v]] <- diag(colSums(current_f[[v]])) %*%
       current_s[[v]] %*% diag(colSums(current_g[[v]]))
     current_f[[v]] <- current_f[[v]] / colSums(current_f[[v]])
@@ -612,13 +601,7 @@ produce_indices <- function(
 #' @param n_views integer, number of views
 #' @param row_names list of vectors, row names for each view
 #' @param col_names list of vectors, column names for each view
-#' @return list with six elements:
-#'         data_reordered: list of matrices,
-#'          reordered data grouped by view subsets
-#'         existing_view_subsets_r:
-#'          list of existing view subsets for rows
-#'         existing_view_subsets_c:
-#'          list of existing view subsets for columns
+#' @return list with two elements:
 #'         row_indices: a list where each element is a hash corresponding to a
 #'          view, where the keys are the other views and
 #'          the values are the shared row names between the two views.
@@ -626,11 +609,6 @@ produce_indices <- function(
 #'           a list where each element is a hash corresponding to a
 #'          view, where the keys are the other views and
 #'          the values are the shared column names between the two views
-#'         row_lists:
-#'          list of vectors of row names for each view ordered by view subsets
-#'         col_lists:
-#'          list of vectors of column names for each view ordered
-#'          by view subsets
 #' @noRd
 reorder_data <- function(data, n_views, row_names, col_names) {
   # for each view v, find R^(v) - the list of existing view subsets A for view v
@@ -667,34 +645,13 @@ reorder_data <- function(data, n_views, row_names, col_names) {
     }
   }
 
-  # reorder_data
-  data_reordered <- vector("list", length = n_views)
-  row_orders <- list()
-  col_orders <- list()
-  for (view in 1:n_views) {
-    row_order <- unlist(
-      row_lists[sapply(existing_view_subsets_r, function(x) view %in% x)]
-    )
-    col_order <- unlist(
-      col_lists[sapply(existing_view_subsets_c, function(x) view %in% x)]
-    )
-    data_reordered[[view]] <- data[[view]][row_order, col_order]
-    row_orders <- c(row_orders, list(row_order))
-    col_orders <- c(col_orders, list(col_order))
-  }
-
   indices <- produce_indices(
     row_lists, col_lists,
     existing_view_subsets_r, existing_view_subsets_c, n_views
   )
   return(list(
-    "data_reordered" = data_reordered,
-    "existing_view_subsets_r" = existing_view_subsets_r,
-    "existing_view_subsets_c" = existing_view_subsets_c,
     "row_indices" = indices$shared_rows,
-    "col_indices" = indices$shared_cols,
-    "row_lists" = row_lists,
-    "col_lists" = col_lists
+    "col_indices" = indices$shared_cols
   ))
 }
 
