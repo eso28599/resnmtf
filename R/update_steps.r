@@ -91,17 +91,26 @@ init_mats_inner <- function(
     vals <- 1:k
     ss <- svd(x[[i]])
     init_f[[i]] <- abs(ss$u[, vals])
-    normal_f <- matrix_normalisation(init_f[[i]])
-    init_f[[i]] <- normal_f$normalised_matrix
+    init_g[[i]] <- abs(ss$v[, vals])
     init_s[[i]] <- abs(diag(ss$d)[vals, vals])
     init_s[[i]] <- init_s[[i]] + abs(MASS::mvrnorm(
       n = k,
       mu = rep(0, k), Sigma = sigma * diag(k)
     )[vals, vals])
-    init_g[[i]] <- abs(ss$v[, vals])
-    normal_g <- matrix_normalisation(init_g[[i]])
-    init_g[[i]] <- normal_g$normalised_matrix
-    init_s[[i]] <- (normal_f$normaliser) %*% init_s[[i]] %*% normal_g$normaliser
+    col_sums_f <- colSums(init_f[[i]])
+    col_sums_g <- colSums(init_g[[i]])
+    init_s[[i]] <- sweep(
+      init_s[[i]], 2, col_sums_f * col_sums_g,
+      FUN = "*"
+    )
+    init_f[[i]] <- sweep(
+      init_f[[i]], 2, col_sums_f,
+      FUN = "/"
+    )
+    init_g[[i]] <- sweep(
+      init_g[[i]], 2, col_sums_g,
+      FUN = "/"
+    )
     init_lambda[[i]] <- colSums(init_f[[i]])
     init_mu[[i]] <- colSums(init_g[[i]])
     # add row and column names

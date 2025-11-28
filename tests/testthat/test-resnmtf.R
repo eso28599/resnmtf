@@ -106,6 +106,14 @@ test_that("resnmtf runs with no stability and no spurious removal", {
     k_vec = c(3, 3),
     spurious = FALSE, stability = FALSE
   )
+  expect_equal(colSums(results$output_f[[1]]), rep(1, 3))
+  expect_equal(colSums(results$output_g[[1]]), rep(1, 3))
+  expect_true(
+    mean(colSums(
+      results$output_f[[1]] %*% results$output_s[[1]] %*%
+        t(results$output_g[[1]])
+    ) - 1) < 1e-3
+  )
   expect_equal(length(results$output_f), 2)
   expect_equal(dim(results$output_f[[1]])[1], n_row * 3)
   expect_equal(dim(results$output_f[[1]])[2], 3)

@@ -83,13 +83,7 @@ star_prod_relevant <- function(vec, mat_list, current_mat, indices) {
 #' @details This function normalises a matrix so that the l1 norm
 #'          of each column is 1.
 matrix_normalisation <- function(matrix) {
-  col_sums <- colSums(matrix)
-  normalised_matrix <- matrix / col_sums
-  colnames(normalised_matrix) <- colnames(matrix)
-  return(list(
-    "normaliser" = diag(col_sums),
-    "normalised_matrix" = normalised_matrix
-  ))
+  return(sweep(matrix, 2, colSums(matrix), FUN = "/"))
 }
 
 #' @description Computes the Jensen-Shannon divergence between two vectors
@@ -177,17 +171,24 @@ calculate_error <- function(data, current_f, current_s, current_g, n_v) {
 #' @return list of matrices, normalised F, G and S matrices
 normalisation_check <- function(current_f, current_g, current_s, n_v) {
   for (v in 1:n_v) {
-    current_s[[v]] <- diag(colSums(current_f[[v]])) %*%
-      current_s[[v]] %*% diag(colSums(current_g[[v]]))
-    current_f[[v]] <- current_f[[v]] / colSums(current_f[[v]])
-    current_g[[v]] <- current_g[[v]] / colSums(current_g[[v]])
+    current_s[[v]] <- sweep(
+      current_s[[v]], 2, colSums(current_f[[v]]) * colSums(current_g[[v]]),
+      FUN = "*"
+    )
+    current_f[[v]] <- sweep(
+      current_f[[v]], 2, colSums(current_f[[v]]),
+      FUN = "/"
+    )
+    current_g[[v]] <- sweep(
+      current_g[[v]], 2, colSums(current_g[[v]]),
+      FUN = "/"
+    )
   }
   return(list(
     "current_f" = current_f, "current_g" = current_g,
     "current_s" = current_s
   ))
 }
-
 
 #' @title Extract bisilhouette scores
 #' @description Extract bisilhouette scores from results list
@@ -414,7 +415,7 @@ check_inputs <- function(data, init_f, init_s,
     data <- lapply(data, function(x) as.matrix(x))
   }
   # normalise matrix
-  data <- lapply(data, function(x) matrix_normalisation(x)$normalised_matrix)
+  data <- lapply(data, function(x) matrix_normalisation(x))
   ranks <- vapply(data, ncol, integer(1))
   # check if distance is a valid distance metric
   if (!distance %in% c("euclidean", "manhattan", "cosine")) {
@@ -653,40 +654,4 @@ reorder_data <- function(data, n_views, row_names, col_names) {
     "row_indices" = indices$shared_rows,
     "col_indices" = indices$shared_cols
   ))
-}
-
-#' @title Reorder results to original order
-#' @description Reorder results to original order, inner function
-#' @param results list of results from ResNMTF
-#' @param names list of vectors, names for each view
-#' @param n_views integer, number of views
-#' @return list of results from ResNMTF reordered to original order
-#' @noRd
-original_order_inner <- function(result, names, n_views) {
-  for (view in 1:n_views) {
-    result[[view]] <- result[[view]][names[[view]], ]
-  }
-  return(result)
-}
-
-#' @title Reorder results to original order
-#' @description Reorder results to original order
-#' @param results list of results from ResNMTF
-#' @param row_names list of vectors, row names for each view
-#' @param col_names list of vectors, column names for each view
-#' @param n_views integer, number of views
-#' @return list of results from ResNMTF reordered to original order
-#' @noRd
-original_order <- function(results, row_names, col_names, n_views) {
-  results$output_f <- original_order_inner(results$output_f, row_names, n_views)
-  results$output_g <- original_order_inner(results$output_g, col_names, n_views)
-  results$row_clusters <- original_order_inner(
-    results$row_clusters,
-    row_names, n_views
-  )
-  results$col_clusters <- original_order_inner(
-    results$col_clusters,
-    col_names, n_views
-  )
-  return(results)
 }
