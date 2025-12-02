@@ -145,7 +145,7 @@ update_f <- function(
   current_f <- input_f[[v]]
   numerator_matrix <- x %*% input_g %*% t(input_s)
   denominator_matrix <- current_f %*%
-    input_s %*% t(input_g) %*% input_g %*% t(input_s)
+    input_s %*% (crossprod(input_g) %*% t(input_s))
   # update f
   phi_vec <- (phi + t(phi))[, v]
   lambda_mat <- 0.5 * t(matrix(lambda_in, length(lambda_in), nrow(current_f)))
@@ -181,9 +181,9 @@ update_g <- function(
     v, column_indices) {
   # Find numerator
   current_g <- input_g[[v]]
-  numerator_matrix <- t(x) %*% input_f %*% input_s
+  numerator_matrix <- crossprod(x, input_f) %*% input_s
   denominator_matrix <- current_g %*%
-    t(input_s) %*% t(input_f) %*% input_f %*% input_s
+    t(input_s) %*% (crossprod(input_f) %*% input_s)
   mu_mat <- 0.5 * t(matrix(mu_in, length(mu_in), nrow(current_g)))
   # update g
   if (sum(psi) == 0) {
@@ -217,9 +217,8 @@ update_g <- function(
 update_s <- function(x, input_f, input_s, input_g, xi, v) {
   # Find numerator and demoninator
   current_s <- input_s[[v]]
-  numerator_matrix <- t(input_f) %*% x %*% input_g
-  denominator_matrix <- t(input_f) %*%
-    input_f %*% current_s %*% t(input_g) %*% input_g
+  numerator_matrix <- crossprod(input_f, x) %*% input_g
+  denominator_matrix <- crossprod(input_f) %*% current_s %*% crossprod(input_g)
   # update s
   if (sum(xi) == 0) {
     output_s <- current_s * (numerator_matrix / denominator_matrix)

@@ -150,13 +150,15 @@ cart_prod <- function(a, b) {
 #' @param current_s list of matrices, current S matrices
 #' @param current_g list of matrices, current G matrices
 #' @param n_v integer, number of views
+#' @param data_norms numeric vector, norms of each data matrix
 #' @noRd
 #' @return numeric vector, error for each view
-calculate_error <- function(data, current_f, current_s, current_g, n_v) {
+calculate_error <- function(
+    data, current_f, current_s, current_g, n_v, data_norms) {
   err <- c()
   for (v in 1:n_v) {
     x_hat <- current_f[[v]] %*% current_s[[v]] %*% t(current_g[[v]])
-    err <- c(err, norm((data[[v]] - x_hat), "F")**2 / norm((data[[v]]), "F")**2)
+    err <- c(err, norm((data[[v]] - x_hat), "F")**2 / data_norms[v])
   }
   return(err)
 }

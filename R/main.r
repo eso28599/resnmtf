@@ -45,6 +45,7 @@ res_nmtf_inner <- function(
   current_g <- initial_mats$current_g
   current_lam <- initial_mats$current_lam
   current_mu <- initial_mats$current_mu
+  data_norms <- sapply(data, function(x) norm(x, "F")**2)
   # Update until convergence, or for n_iters times
   if (is.null(n_iters)) {
     total_err <- c()
@@ -70,7 +71,9 @@ res_nmtf_inner <- function(
       current_g <- new_parameters$output_g
       current_lam <- new_parameters$output_lam
       current_mu <- new_parameters$output_mu
-      err <- calculate_error(data, current_f, current_s, current_g, n_v)
+      err <- calculate_error(
+        data, current_f, current_s, current_g, n_v, data_norms
+      )
       mean_err <- mean(err)
       total_err <- c(total_err, mean_err)
       err_diff <- abs(mean_err - err_temp)
@@ -100,7 +103,7 @@ res_nmtf_inner <- function(
       current_mu <- new_parameters$output_mu
       total_err[t] <- mean(calculate_error(
         data, current_f,
-        current_s, current_g, n_v
+        current_s, current_g, n_v, data_norms
       ))
     }
   }
