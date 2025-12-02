@@ -1,6 +1,6 @@
 Package: resnmtf
 Title: Determining a multi-view biclustering via ResNMTF
-Version: 2.0.0.6
+Version: 2.0.0.7
 Authors@R: 
     person("Ella", "Orme", email = "eso18@ic.ac.uk", role = c("aut", "cre"))
 Description: The package provides functions for performing ResNMTF on

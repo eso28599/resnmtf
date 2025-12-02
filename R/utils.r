@@ -155,11 +155,12 @@ cart_prod <- function(a, b) {
 #' @return numeric vector, error for each view
 calculate_error <- function(
     data, current_f, current_s, current_g, n_v, data_norms) {
-  err <- c()
+  err <- rep(0, n_v)
   for (v in 1:n_v) {
     x_hat <- current_f[[v]] %*% current_s[[v]] %*% t(current_g[[v]])
-    err <- c(err, norm((data[[v]] - x_hat), "F")**2 / data_norms[v])
+    err[v] <- norm((data[[v]] - x_hat), "F")**2
   }
+  err <- err / data_norms
   return(err)
 }
 
