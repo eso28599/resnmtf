@@ -64,12 +64,13 @@ star_prod_relevant <- function(vec, mat_list, current_mat, indices) {
   vec_mat <- 0
   for (i in seq_len(length(vec))) {
     if (vec[i] != 0) {
-      masked_matrix <- matrix(0, nrow(current_mat), ncol(current_mat))
+      masked_matrix <- current_mat
       rownames(masked_matrix) <- rownames(current_mat)
       rows <- indices[[as.character(i)]]
       if (!any(is.na(rows))) {
         masked_matrix[rows, ] <- mat_list[[i]][rows, ]
-        vec_mat <- vec_mat + vec[i] * masked_matrix * length(rows)
+        # vec_mat <- vec_mat + vec[i] * masked_matrix * length(rows)
+        vec_mat <- vec_mat + vec[i] * masked_matrix * nrow(mat_list[[i]])
       }
     }
   }
@@ -564,7 +565,8 @@ produce_indices <- function(
   for (view1 in 1:n_views) {
     shared_v1 <- hash::hash()
     shared_c_v1 <- hash::hash()
-    for (view2 in (1:3)[-view1]) {
+    # add in n_views ==1 case
+    for (view2 in (1:n_views)[-view1]) {
       common_rows <- unlist(
         row_lists[
           sapply(
@@ -587,7 +589,7 @@ produce_indices <- function(
         shared_v1[[as.character(view2)]] <- NA
       }
       if (length(common_cols) != 0) {
-        shared_c_v1[[as.character(view2)]] <- common_rows
+        shared_c_v1[[as.character(view2)]] <- common_cols
       } else {
         shared_c_v1[[as.character(view2)]] <- NA
       }

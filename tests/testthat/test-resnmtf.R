@@ -34,11 +34,6 @@ test_that("view shuffling works", {
   expect_equal(dim(lapply(data, shuffle_view)[[1]])[1], 10)
 })
 
-data <- list(
-  matrix(rnorm(2000), 100, 20),
-  matrix(rnorm(2000), 100, 20)
-)
-
 # number of rows/columns, divided by 3
 n_col <- 60
 n_row <- 60
@@ -159,7 +154,7 @@ test_that("resnmtf runs with restriction matrices and partially overlapping", {
   rest_mat <- matrix(0, 2, 2)
   rest_mat[1, 2] <- 1000
   results <- apply_resnmtf(data,
-    k_vec = c(3, 3), phi = rest_mat, rest_mat,
+    k_vec = c(3, 3), phi = rest_mat, psi = rest_mat,
     spurious = FALSE, stability = FALSE
   )
   expect_equal(length(results$output_f), 2)

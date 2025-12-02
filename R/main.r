@@ -246,7 +246,7 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
   # if number of clusters has been specified method can be applied straight away
   if ((!is.null(k_vec))) {
     results <- res_nmtf_inner(
-      data, reordering$row_indices, reordering$column_indices,
+      data, reordering$row_indices, reordering$col_indices,
       init_f, init_s, init_g,
       k_vec, phi, xi, psi, n_iters,
       num_repeats, spurious, distance, no_clusts
@@ -277,7 +277,7 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
     res_list <- vector("list", length = n_k)
     for (i in 1:n_k) {
       res_list[[i]] <- res_nmtf_inner(
-        data, reordering$row_indices, reordering$column_indices,
+        data, reordering$row_indices, reordering$col_indices,
         init_f, init_s, init_g,
         k_vec[i] * ones_vec, phi, xi, psi, n_iters,
         num_repeats, spurious, distance, no_clusts
@@ -288,7 +288,7 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
     doParallel::registerDoParallel(min(parallel::detectCores(), length(k_vec)))
     res_list <- foreach::foreach(i = seq_along(k_vec)) %dopar% {
       res_nmtf_inner(
-        data, reordering$row_indices, reordering$column_indices,
+        data, reordering$row_indices, reordering$col_indices,
         init_f, init_s, init_g,
         k_vec[i] * ones_vec, phi, xi, psi, n_iters,
         num_repeats, spurious, distance, no_clusts
