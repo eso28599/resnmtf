@@ -148,8 +148,8 @@ res_nmtf_inner <- function(
 #' @param init_f list of matrices, initialisation for F matrices
 #' @param init_s list of matrices, initialisation for S matrices
 #' @param init_g list of matrices, initialisation for G matrices
-#' @param k_vec vector of integers, number of clusters to consider
-#'              in each view, default is NULL
+#' @param k  integer, number of clusters to consider
+#'              in each view if known, default is NULL
 #' @param phi n_v x n_v matrix, default is NULL, restriction matrices for F
 #' @param xi n_v x n_v matrix, default is NULL, restriction matrices for S
 #' @param psi n_v x n_v matrix, default is NULL, restriction matrices for G
@@ -159,6 +159,7 @@ res_nmtf_inner <- function(
 #'              largest value of k to be considered initially,
 #' @param k_min positive integer, default is 3,
 #'              smallest value of k to be considered initially,
+#'              must be at least 2,
 #' @param distance string, default is "euclidean",
 #'                 distance metric to use within the bisilhouette score
 #' @param spurious boolean, default is TRUE, whether or not spurious biclusters
@@ -211,7 +212,7 @@ res_nmtf_inner <- function(
 #' )
 #' apply_resnmtf(data, k_max = 4)
 apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
-                          init_g = NULL, k_vec = NULL,
+                          init_g = NULL, k = NULL,
                           phi = NULL, xi = NULL, psi = NULL,
                           n_iters = NULL, k_min = 3, k_max = 8,
                           distance = "euclidean", spurious = TRUE,
@@ -222,6 +223,7 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
                           remove_unstable = TRUE, use_parallel = TRUE) {
   # initialise restriction matrices if not specified
   n_v <- length(data)
+  k_vec <- rep(k[1], n_v)
   # check naming
   named_data <- give_names(data, n_v, phi, psi)
   # get data indices

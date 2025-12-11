@@ -9,7 +9,7 @@ apply_resnmtf(
   init_f = NULL,
   init_s = NULL,
   init_g = NULL,
-  k_vec = NULL,
+  k = NULL,
   phi = NULL,
   xi = NULL,
   psi = NULL,
@@ -38,8 +38,8 @@ view is supplied, can be given as a matrix.}
 
 \item{init_g}{list of matrices, initialisation for G matrices}
 
-\item{k_vec}{vector of integers, number of clusters to consider
-in each view, default is NULL}
+\item{k}{integer, number of clusters to consider
+in each view if known, default is NULL}
 
 \item{phi}{n_v x n_v matrix, default is NULL, restriction matrices for F}
 
@@ -51,7 +51,8 @@ in each view, default is NULL}
 otherwise will run until convergence}
 
 \item{k_min}{positive integer, default is 3,
-smallest value of k to be considered initially,}
+smallest value of k to be considered initially,
+must be at least 2,}
 
 \item{k_max}{positive integer, default is 6,
 largest value of k to be considered initially,}

@@ -61,7 +61,7 @@ test_that("get warning for negative matrix", {
 # -----------------------------------
 
 test_that("resnmtf runs without stability with spurious removal", {
-  results <- apply_resnmtf(data, k_vec = c(3, 3), stability = FALSE)
+  results <- apply_resnmtf(data, k = 3, stability = FALSE)
   expect_equal(length(results$output_f), 2)
   expect_equal(dim(results$output_f[[1]])[1], n_row * 3)
   expect_equal(dim(results$output_f[[1]])[2], 3)
@@ -72,7 +72,7 @@ test_that("resnmtf runs without stability with spurious removal", {
 })
 
 test_that("resnmtf runs with stability and spurious removal", {
-  results <- apply_resnmtf(data, k_vec = c(3, 3))
+  results <- apply_resnmtf(data, k = 3)
   expect_equal(length(results$output_f), 2)
   expect_equal(dim(results$output_f[[1]])[1], n_row * 3)
   expect_equal(dim(results$output_f[[1]])[2], 3)
@@ -84,7 +84,7 @@ test_that("resnmtf runs with stability and spurious removal", {
 
 test_that("resnmtf runs with stability and no spurious removal", {
   results <- apply_resnmtf(data,
-    k_vec = c(3, 3),
+    k = 3,
     spurious = FALSE
   )
   expect_equal(length(results$output_f), 2)
@@ -95,10 +95,18 @@ test_that("resnmtf runs with stability and no spurious removal", {
   expect_setequal(colSums(results$row_clusters[[1]]), colSums(row_clusters))
   expect_setequal(colSums(results$col_clusters[[1]]), colSums(col_clusters))
 })
-
+time_start <- Sys.time()
+# Rprof()
+results <- apply_resnmtf(data,
+  k = 3,
+  spurious = FALSE, stability = FALSE
+)
+time_end <- Sys.time()
+# Rprof(NULL)
+time_end - time_start
 test_that("resnmtf runs with no stability and no spurious removal", {
   results <- apply_resnmtf(data,
-    k_vec = c(3, 3),
+    k = 3,
     spurious = FALSE, stability = FALSE
   )
   expect_equal(colSums(results$output_f[[1]]), rep(1, 3))
@@ -154,7 +162,7 @@ test_that("resnmtf runs with restriction matrices and partially overlapping", {
   rest_mat <- matrix(0, 2, 2)
   rest_mat[1, 2] <- 1000
   results <- apply_resnmtf(data,
-    k_vec = c(3, 3), phi = rest_mat, psi = rest_mat,
+    k = 3, phi = rest_mat, psi = rest_mat,
     spurious = FALSE, stability = FALSE
   )
   expect_equal(length(results$output_f), 2)

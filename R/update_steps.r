@@ -19,7 +19,7 @@ init_rest_mats <- function(mat, n_v) {
   } else {
     # If not NULL, return the input matrix (validate the existing matrix)
     diag(mat) <- 0 # ensure diagonal is zero
-    return(mat)
+    return(mat + t(mat)) # ensure symmetry
   }
 }
 
@@ -147,7 +147,7 @@ update_f <- function(
   denominator_matrix <- current_f %*%
     input_s %*% (crossprod(input_g) %*% t(input_s))
   # update f
-  phi_vec <- (phi + t(phi))[, v]
+  phi_vec <- phi[, v]
   lambda_mat <- 0.5 * t(matrix(lambda_in, length(lambda_in), nrow(current_f)))
   if (sum(phi_vec) == 0) {
     output_f <- current_f *
@@ -189,7 +189,7 @@ update_g <- function(
   if (sum(psi) == 0) {
     output_g <- current_g * (numerator_matrix / (denominator_matrix + mu_mat))
   } else {
-    psi_vec <- (psi + t(psi))[, v]
+    psi_vec <- psi[, v]
     num_mat_prod <- star_prod_relevant(
       psi_vec, input_g, current_g,
       column_indices
@@ -223,7 +223,7 @@ update_s <- function(x, input_f, input_s, input_g, xi, v) {
   if (sum(xi) == 0) {
     output_s <- current_s * (numerator_matrix / denominator_matrix)
   } else {
-    xi_vec <- (xi + t(xi))[, v]
+    xi_vec <- xi[, v]
     num_mat_prod <- star_prod(xi_vec, input_s)
     denom_mat_prod <- sum(xi_vec) * current_s
     output_s <- current_s * (
