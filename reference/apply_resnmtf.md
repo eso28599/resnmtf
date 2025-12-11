@@ -11,7 +11,7 @@ apply_resnmtf(
   init_f = NULL,
   init_s = NULL,
   init_g = NULL,
-  k_vec = NULL,
+  k = NULL,
   phi = NULL,
   xi = NULL,
   psi = NULL,
@@ -50,10 +50,10 @@ apply_resnmtf(
 
   list of matrices, initialisation for G matrices
 
-- k_vec:
+- k:
 
-  vector of integers, number of clusters to consider in each view,
-  default is NULL
+  integer, number of clusters to consider in each view if known, default
+  is NULL
 
 - phi:
 
@@ -75,7 +75,7 @@ apply_resnmtf(
 - k_min:
 
   positive integer, default is 3, smallest value of k to be considered
-  initially,
+  initially, must be at least 2,
 
 - k_max:
 

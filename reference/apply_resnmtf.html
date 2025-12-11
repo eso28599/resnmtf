@@ -9,7 +9,7 @@ the optimal number, with optional stability analysis"></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">resnmtf</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.8</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0.9</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,7 +45,7 @@ the optimal number, with optional stability analysis</p>
 <span>  init_f <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  init_s <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  init_g <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  k_vec <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  k <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  phi <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  xi <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  psi <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -86,9 +86,9 @@ view is supplied, can be given as a matrix.</p></dd>
 <dd><p>list of matrices, initialisation for G matrices</p></dd>
 
 
-<dt id="arg-k-vec">k_vec<a class="anchor" aria-label="anchor" href="#arg-k-vec"></a></dt>
-<dd><p>vector of integers, number of clusters to consider
-in each view, default is NULL</p></dd>
+<dt id="arg-k">k<a class="anchor" aria-label="anchor" href="#arg-k"></a></dt>
+<dd><p>integer, number of clusters to consider
+in each view if known, default is NULL</p></dd>
 
 
 <dt id="arg-phi">phi<a class="anchor" aria-label="anchor" href="#arg-phi"></a></dt>
@@ -110,7 +110,8 @@ otherwise will run until convergence</p></dd>
 
 <dt id="arg-k-min">k_min<a class="anchor" aria-label="anchor" href="#arg-k-min"></a></dt>
 <dd><p>positive integer, default is 3,
-smallest value of k to be considered initially,</p></dd>
+smallest value of k to be considered initially,
+must be at least 2,</p></dd>
 
 
 <dt id="arg-k-max">k_max<a class="anchor" aria-label="anchor" href="#arg-k-max"></a></dt>
