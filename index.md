@@ -31,6 +31,37 @@ using a non-“reference” version of BLAS (a library to perform standard
 mathematical operations). It’s really easy to use a quicker version, see
 [here](https://higgicd.github.io/posts/accelerating_r/) for an example.
 
+## The model
+
+By assuming a known $K$, $K \geq 3$, the aim of Restrictive Non-negative
+Matrix Tri-Factorisation is to solve the optimisation problem given by:
+\$\begin{align\*} &\hspace{2cm}\min \_{F^{(v)}, S^{(v)}, G^{(v)}}
+\left(\sum\_{v=1}^{n_v}\left\\X^{(v)}-F^{(v)}
+S^{(v)}\left(G^{(v)}\right)^T\right\\^2\right. \hspace{2cm} \\
+&\left.+\sum\_{w=v+1}^{n_v}\sum\_{v=1}^{n_v - 1} \left(\phi\_{vw}
+\left\\F^{(v)}-F\_{\textcolor{red}{v}}^{(w)}\right\\^2 +
+\xi\_{vw}\left\\S^{(v)}-S^{(w)}\right\\^2 +
+\psi\_{vw}\left\\G^{(v)}-G\_{\textcolor{red}{v}}^{(w)}\right\\^2 \right)
+\right)\nonumber \end{align\*}\$ such that for all $v$ in $1:n_{v}$:
+
+- ${||}F_{.,k}^{(v)}{||},{||}G_{.,k}^{(v)}{||} = 1,\quad\forall k = 1,2,\cdots,K$
+- $F^{(v)},S^{(v)},G^{(v)} \geq 0$
+- $F_{v}^{(w)} = \left\{ \begin{array}{l}
+  {F^{(w)}{\mspace{6mu}\text{if}\mspace{6mu}}n_{r}^{(v)} = n_{r}^{(w)}} \\
+  {F^{(v)}{\mspace{6mu}\text{otherwise}}}
+  \end{array} \right.$ and $G_{v}^{(w)} = \left\{ \begin{array}{l}
+  {G^{(w)}{\mspace{6mu}\text{if}\mspace{6mu}}n_{c}^{(v)} = n_{c}^{(w)}} \\
+  {G^{(v)}{\mspace{6mu}\text{otherwise}}}
+  \end{array} \right.$
+
+where $\Phi = (\phi)_{vw}$, $\Xi = (\xi)_{vw}$, $\Psi = (\psi)_{vw}$ are
+upper triangular non-negative matrices. $\phi_{vw},\xi_{vw},\psi_{vw}$
+are tuning parameters allowing for different restrictions. Different
+combinations of tuning parameters enforce different combinations of
+restrictions. For example, non-zero $\phi_{12}$ means views one and two
+share common row clusters, therefore $F^{(1)}$ and $F^{(2)}$ are forced
+towards each other.
+
 ## Usage
 
 To demonstrate the use of `resnmtf` we generate toy data with 2 views
