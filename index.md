@@ -36,6 +36,9 @@ mathematical operations). It’s really easy to use a quicker version, see
 By assuming a known $K$, $K \geq 3$, the aim of Restrictive Non-negative
 Matrix Tri-Factorisation is to solve the optimisation problem given by:
 
+![Objective function of resNMTF, see
+paper.](reference/figures/objective_function.png)
+
 where $\Phi = (\phi)\_{vw}$, $\Xi = (\xi)\_{vw}$, $\Psi = (\psi)\_{vw}$
 are upper triangular non-negative matrices.
 $\phi\_{vw},\xi\_{vw},\psi\_{vw}$ are tuning parameters allowing for
