@@ -25,6 +25,9 @@ devtools::install_github("eso28599/resnmtf") # requires devtools package to be i
 
 ## The model 
 By assuming a known $K$, $K \ge 3$, the aim of Restrictive Non-negative Matrix Tri-Factorisation is to solve the optimisation problem given by: 
+<p align="center">
+<img src="man/figures/objective_function.png" alt="Objective function of resNMTF, see paper." width="500">
+</p>
 
 where $\Phi=(\phi)\_{v w}$,  $\Xi=(\xi)\_{v w}$, $\Psi=(\psi)\_{vw}$ are upper triangular non-negative matrices. $\phi\_{vw}, \xi\_{vw}, \psi\_{vw}$ are tuning parameters allowing for different restrictions. Different combinations of tuning parameters enforce different combinations of restrictions. For example, non-zero $\phi\_{12}$ means views one and two share common row clusters, therefore $F^{(1)}$ and $F^{(2)}$ are forced towards each other. 
 
