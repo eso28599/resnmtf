@@ -25,24 +25,8 @@ devtools::install_github("eso28599/resnmtf") # requires devtools package to be i
 
 ## The model 
 By assuming a known $K$, $K \ge 3$, the aim of Restrictive Non-negative Matrix Tri-Factorisation is to solve the optimisation problem given by: 
-$\begin{align*}
-    &\hspace{2cm}\min _{F^{(v)}, S^{(v)}, G^{(v)}} \left(\sum_{v=1}^{n_v}\left\|X^{(v)}-F^{(v)} S^{(v)}\left(G^{(v)}\right)^T\right\|^2\right. \hspace{2cm} \\ 
-    &\left.+\sum_{w=v+1}^{n_v}\sum_{v=1}^{n_v - 1} \left(\phi_{vw}  \left\|F^{(v)}-F_{\textcolor{red}{v}}^{(w)}\right\|^2   + \xi_{vw}\left\|S^{(v)}-S^{(w)}\right\|^2  +
-\psi_{vw}\left\|G^{(v)}-G_{\textcolor{red}{v}}^{(w)}\right\|^2  \right) \right)\nonumber 
-\end{align*}$
-such that for all $v$ in $1:n_v$:
 
-* $||F^{(v)}_{.,k}||, ||G^{(v)}_{.,k}|| = 1, \quad \forall k=1,2, \cdots, K$
-* $F^{(v)}, S^{(v)}, G^{(v)} \geq 0$
-* $F_v^{(w)}=\begin{cases}
-        F^{(w)} \text{ if } n_r^{(v)}=n_r^{(w)} \\ 
-        F^{(v)} \text{ otherwise}
-    \end{cases}$ and $G_v^{(w)}=\begin{cases}
-        G^{(w)} \text{ if } n_c^{(v)}=n_c^{(w)} \\ 
-        G^{(v)} \text{ otherwise}
-    \end{cases}$
-
-where $\Phi=(\phi)_{v w}$,  $\Xi=(\xi)_{v w}$, $\Psi=(\psi)_{v w}$ are upper triangular non-negative matrices. $\phi_{vw}, \xi_{vw}, \psi_{vw}$ are tuning parameters allowing for different restrictions. Different combinations of tuning parameters enforce different combinations of restrictions. For example, non-zero $\phi_{12}$ means views one and two share common row clusters, therefore $F^{(1)}$ and $F^{(2)}$ are forced towards each other. 
+where $\Phi=(\phi)\_{v w}$,  $\Xi=(\xi)\_{v w}$, $\Psi=(\psi)\_{vw}$ are upper triangular non-negative matrices. $\phi\_{vw}, \xi\_{vw}, \psi\_{vw}$ are tuning parameters allowing for different restrictions. Different combinations of tuning parameters enforce different combinations of restrictions. For example, non-zero $\phi\_{12}$ means views one and two share common row clusters, therefore $F^{(1)}$ and $F^{(2)}$ are forced towards each other. 
 
 ## Usage 
 To demonstrate the use of `resnmtf` we generate toy data with 2 views and 3 biclusters, assuming biclusters share rows across views, but do not share columns. View 1 has dimensions $100 \times 50$ and view 2, $100 \times 30$.
