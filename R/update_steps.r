@@ -150,8 +150,9 @@ update_f <- function(
   phi_vec <- phi[, v]
   lambda_mat <- 0.5 * t(matrix(lambda_in, length(lambda_in), nrow(current_f)))
   if (sum(phi_vec) == 0) {
-    output_f <- current_f *
-      ((numerator_matrix) / (denominator_matrix + lambda_mat))
+    matrix <- (numerator_matrix / (denominator_matrix + lambda_mat))
+    matrix[is.nan(matrix)] <- 1 # handle NaN cases
+    output_f <- current_f * matrix
   } else {
     num_mat_prod <- star_prod_relevant(phi_vec, input_f, current_f, row_indices)
     denom_mat_prod <- sum(phi_vec) * current_f
@@ -187,7 +188,9 @@ update_g <- function(
   mu_mat <- 0.5 * t(matrix(mu_in, length(mu_in), nrow(current_g)))
   # update g
   if (sum(psi) == 0) {
-    output_g <- current_g * (numerator_matrix / (denominator_matrix + mu_mat))
+    matrix <- (numerator_matrix / (denominator_matrix + mu_mat))
+    matrix[is.nan(matrix)] <- 1 # handle NaN cases
+    output_g <- current_g * matrix
   } else {
     psi_vec <- psi[, v]
     num_mat_prod <- star_prod_relevant(
@@ -221,7 +224,9 @@ update_s <- function(x, input_f, input_s, input_g, xi, v) {
   denominator_matrix <- crossprod(input_f) %*% current_s %*% crossprod(input_g)
   # update s
   if (sum(xi) == 0) {
-    output_s <- current_s * (numerator_matrix / denominator_matrix)
+    matrix <- (numerator_matrix / denominator_matrix)
+    matrix[is.nan(matrix)] <- 1 # handle NaN cases
+    output_s <- current_s * matrix
   } else {
     xi_vec <- xi[, v]
     num_mat_prod <- star_prod(xi_vec, input_s)

@@ -9,7 +9,7 @@ apply_resnmtf(
   init_f = NULL,
   init_s = NULL,
   init_g = NULL,
-  k = NULL,
+  k_val = NULL,
   phi = NULL,
   xi = NULL,
   psi = NULL,
@@ -38,7 +38,7 @@ view is supplied, can be given as a matrix.}
 
 \item{init_g}{list of matrices, initialisation for G matrices}
 
-\item{k}{integer, number of clusters to consider
+\item{k_val}{integer, number of clusters to consider
 in each view if known, default is NULL}
 
 \item{phi}{n_v x n_v matrix, default is NULL, restriction matrices for F}

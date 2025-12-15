@@ -34,7 +34,7 @@ obtain_shuffled_f <- function(data, n_views, num_repeats, n_clusts) {
     data_messed <- lapply(data, shuffle_view)
     f_mess[[n]] <- apply_resnmtf(
       data = data_messed,
-      k = n_clusts,
+      k_val = n_clusts,
       no_clusts = TRUE, stability = FALSE
     )$output_f
   }

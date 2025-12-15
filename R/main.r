@@ -148,7 +148,7 @@ res_nmtf_inner <- function(
 #' @param init_f list of matrices, initialisation for F matrices
 #' @param init_s list of matrices, initialisation for S matrices
 #' @param init_g list of matrices, initialisation for G matrices
-#' @param k  integer, number of clusters to consider
+#' @param k_val  integer, number of clusters to consider
 #'              in each view if known, default is NULL
 #' @param phi n_v x n_v matrix, default is NULL, restriction matrices for F
 #' @param xi n_v x n_v matrix, default is NULL, restriction matrices for S
@@ -212,7 +212,7 @@ res_nmtf_inner <- function(
 #' )
 #' apply_resnmtf(data, k_max = 4)
 apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
-                          init_g = NULL, k = NULL,
+                          init_g = NULL, k_val = NULL,
                           phi = NULL, xi = NULL, psi = NULL,
                           n_iters = NULL, k_min = 3, k_max = 8,
                           distance = "euclidean", spurious = TRUE,
@@ -223,7 +223,7 @@ apply_resnmtf <- function(data, init_f = NULL, init_s = NULL,
                           remove_unstable = TRUE, use_parallel = TRUE) {
   # initialise restriction matrices if not specified
   n_v <- length(data)
-  k_vec <- rep(k[1], n_v)
+  k_vec <- rep(k_val[1], n_v)
   # check naming
   named_data <- give_names(data, n_v, phi, psi)
   # get data indices
