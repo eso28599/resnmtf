@@ -11,7 +11,7 @@ apply_resnmtf(
   init_f = NULL,
   init_s = NULL,
   init_g = NULL,
-  k = NULL,
+  k_val = NULL,
   phi = NULL,
   xi = NULL,
   psi = NULL,
@@ -50,7 +50,7 @@ apply_resnmtf(
 
   list of matrices, initialisation for G matrices
 
-- k:
+- k_val:
 
   integer, number of clusters to consider in each view if known, default
   is NULL
